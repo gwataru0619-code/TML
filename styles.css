@@ -1,0 +1,78 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  line-height: 1.7;
+  color: #1f2937;
+  background: #f3f6fb;
+}
+
+.container {
+  width: min(900px, 92%);
+  margin: 0 auto;
+}
+
+.hero {
+  background: linear-gradient(120deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  padding: 64px 0 56px;
+  margin-bottom: 28px;
+}
+
+.tag {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.25;
+}
+
+.lead {
+  margin: 0;
+  max-width: 46ch;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 18px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+
+ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+p {
+  margin: 0;
+}
+
+.contact p + p {
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 48px 0 42px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+}
