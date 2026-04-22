@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- 文字化けを防ぐため、文字コードをUTF-8に指定します -->
+    <meta charset="UTF-8" />
+    <!-- スマホでも見やすい幅にするための設定です -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ブラウザのタブに表示されるページ名です -->
+    <title>TYPEMOON資料館</title>
+    <!-- デザインをまとめた外部CSSファイルを読み込みます -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- サイトの最上部に表示する見出しエリアです -->
+    <header class="site-header">
+      <h1>TYPEMOON資料館</h1>
+      <p>作品世界を知るための入口</p>
+    </header>
+
+    <!-- ページの主要コンテンツを入れる領域です -->
+    <main class="container">
+      <!-- 最初の画面で選べるメニューを2つ並べています -->
+      <section class="menu-grid" aria-label="メインメニュー">
+        <!-- 用語集ページへ移動するリンクカードです -->
+        <a class="menu-card" href="glossary.html">
+          <h2>用語集</h2>
+          <p>世界観で使われる基本用語を確認できます。</p>
+        </a>
+
+        <!-- 年表ページへ移動するリンクカードです -->
+        <a class="menu-card" href="timeline.html">
+          <h2>年表</h2>
+          <p>主な出来事を時系列で一覧できます。</p>
+        </a>
+      </section>
+    </main>
+  </body>
+</html>

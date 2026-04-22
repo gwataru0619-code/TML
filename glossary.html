@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- 文字コードをUTF-8に設定して、日本語が正しく表示されるようにします -->
+    <meta charset="UTF-8" />
+    <!-- スマホ表示で見やすくするための設定です -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ブラウザのタブに表示されるページ名です -->
+    <title>用語集 | TYPEMOON資料館</title>
+    <!-- デザイン（色・余白・レイアウト）を読み込むCSSファイルです -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- このheaderはページ上部のタイトルエリアです -->
+    <header class="site-header">
+      <!-- h1はそのページで一番重要な見出しです -->
+      <h1>用語集</h1>
+      <!-- ページの補足説明です -->
+      <p>TYPEMOON世界の基礎用語</p>
+    </header>
+
+    <!-- mainはこのページの中心となるコンテンツ領域です -->
+    <main class="container">
+      <!-- 用語の一覧を表示するカード領域です -->
+      <section class="content-card">
+        <!-- dlは「用語（dt）」と「説明（dd）」のセットを表すタグです -->
+        <dl class="glossary-list">
+          <div>
+            <!-- dtは用語名です -->
+            <dt>魔術</dt>
+            <!-- ddは用語の説明文です -->
+            <dd>神秘を再現するための技法。魔術師が系統や刻印を通じて扱う。</dd>
+          </div>
+          <div>
+            <dt>聖杯戦争</dt>
+            <dd>願望機・聖杯を巡ってマスターとサーヴァントが争う儀式。</dd>
+          </div>
+          <div>
+            <dt>根源</dt>
+            <dd>世界の始まりに連なる究極地点。多くの魔術師が到達を目指す。</dd>
+          </div>
+          <div>
+            <dt>英霊</dt>
+            <dd>歴史や伝承に名を残し、座に記録された英雄の霊。</dd>
+          </div>
+        </dl>
+      </section>
+      <!-- href="index.html" でトップページへ移動します -->
+      <p><a class="back-link" href="index.html">トップへ戻る</a></p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,163 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  background: linear-gradient(160deg, #0f172a, #1e293b 45%, #334155);
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+.site-header {
+  text-align: center;
+  padding: 56px 16px 24px;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: 0.06em;
+}
+
+.site-header p {
+  margin-top: 12px;
+  color: #cbd5e1;
+}
+
+.container {
+  width: min(960px, 92%);
+  margin: 0 auto 48px;
+}
+
+.menu-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.menu-card {
+  display: block;
+  text-decoration: none;
+  background: rgba(15, 23, 42, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 14px;
+  padding: 24px;
+  transition: transform 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.menu-card:hover,
+.menu-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(125, 211, 252, 0.9);
+  box-shadow: 0 8px 26px rgba(14, 116, 144, 0.35);
+}
+
+.menu-card h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #e0f2fe;
+}
+
+.menu-card p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.content-card {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.content-card h2 {
+  margin-top: 0;
+  color: #e0f2fe;
+}
+
+.glossary-list {
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.glossary-list div {
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.45);
+}
+
+.glossary-list div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.glossary-list dt {
+  font-weight: 700;
+  color: #e0f2fe;
+}
+
+.glossary-list dd {
+  margin: 6px 0 0;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.timeline {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.timeline .year {
+  font-weight: 700;
+  color: #e0f2fe;
+}
+
+.timeline p {
+  margin: 6px 0 0;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.simple-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.simple-list li {
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.45);
+  line-height: 1.6;
+}
+
+.simple-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 24px;
+  text-decoration: none;
+  border: 1px solid rgba(125, 211, 252, 0.7);
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: #bae6fd;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+  background: rgba(14, 116, 144, 0.25);
+}
