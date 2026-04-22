@@ -23,27 +23,27 @@
     <main class="container">
       <!-- 年表を1つのカードとして表示するエリア -->
       <section class="content-card">
-        <!-- 順番が大切な情報なので、番号付きリスト（ol）を使う -->
-        <ol class="timeline">
-          <li>
-            <!-- 出来事の年 -->
-            <span class="year">2000年</span>
-            <!-- その年の出来事 -->
-            <p>同人サークルとして活動を開始。</p>
-          </li>
-          <li>
-            <span class="year">2004年</span>
-            <p>『Fate/stay night』発売。</p>
-          </li>
-          <li>
-            <span class="year">2011年</span>
-            <p>『Fate/Zero』アニメ放送開始。</p>
-          </li>
-          <li>
-            <span class="year">2015年</span>
-            <p>『Fate/Grand Order』サービス開始。</p>
-          </li>
-        </ol>
+        <!-- iframeは、外部サイトのページをこの場所に埋め込んで表示するタグです -->
+        <div class="timeline-embed-wrapper">
+          <iframe
+            class="timeline-embed"
+            src="https://app.the-timeline.jp/2PACX-1vRE0ZSXik0LmziAh2p5H5eRO2KsecphF0FLVixWdXP5tI14m_UyJlFgI7j0eaZpQUnYU3VW0KcdCUq4"
+            title="TYPEMOON年表"
+            loading="lazy"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <!-- もし埋め込みが表示されない環境でも、直接ページを開けるリンクを用意します -->
+        <p>
+          <a
+            class="timeline-source-link"
+            href="https://app.the-timeline.jp/2PACX-1vRE0ZSXik0LmziAh2p5H5eRO2KsecphF0FLVixWdXP5tI14m_UyJlFgI7j0eaZpQUnYU3VW0KcdCUq4"
+            target="_blank"
+            rel="noopener noreferrer"
+            >年表を別タブで開く</a
+          >
+        </p>
       </section>
 
       <!-- トップページへ戻るためのリンク -->
