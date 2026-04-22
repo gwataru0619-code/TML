@@ -128,6 +128,21 @@ a {
   line-height: 1.6;
 }
 
+.timeline-embed-wrapper {
+  /* iframeのサイズを枠の中で管理しやすくするための入れ物 */
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.timeline-embed {
+  /* 横幅いっぱいに表示しつつ、縦は十分な高さを確保 */
+  width: 100%;
+  min-height: 760px;
+  border: 0;
+  background: #0f172a;
+}
+
 .simple-list {
   list-style: none;
   margin: 0;
