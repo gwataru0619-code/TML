@@ -35,6 +35,11 @@ a {
   margin: 0 auto 48px;
 }
 
+.timeline-container {
+  /* 年表ページだけ、通常より広い幅を使えるようにします */
+  width: min(1600px, 98%);
+}
+
 .menu-grid {
   display: grid;
   gap: 20px;
