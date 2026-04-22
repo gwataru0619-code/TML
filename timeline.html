@@ -7,8 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- ブラウザのタブに表示されるページ名 -->
     <title>年表 | TYPEMOON資料館</title>
-    <!-- 共通デザインを読み込むCSSファイル -->
-    <link rel="stylesheet" href="style.css" />
+    <!-- キャッシュを使いにくくして、更新反映を早めるための設定です -->
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- 共通デザインを読み込むCSSファイル（?v=20260422 はキャッシュ対策） -->
+    <link rel="stylesheet" href="style.css?v=20260422-3" />
   </head>
   <body>
     <!-- ページ上部の見出しエリア -->
@@ -47,7 +54,7 @@
       </section>
 
       <!-- トップページへ戻るためのリンク -->
-      <p><a class="back-link" href="index.html">トップページへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260422-3">トップページへ戻る</a></p>
     </main>
   </body>
 </html>

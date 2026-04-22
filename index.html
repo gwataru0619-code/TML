@@ -5,10 +5,19 @@
     <meta charset="UTF-8" />
     <!-- スマホでも見やすい幅にするための設定です -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ブラウザに「できるだけ最新を再取得してね」と伝えるキャッシュ対策です -->
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <!-- 古いブラウザ向けの追加キャッシュ対策です -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <!-- キャッシュの有効期限を0にして更新を優先させます -->
+    <meta http-equiv="Expires" content="0" />
     <!-- ブラウザのタブに表示されるページ名です -->
     <title>TYPEMOON資料館</title>
-    <!-- デザインをまとめた外部CSSファイルを読み込みます -->
-    <link rel="stylesheet" href="style.css" />
+    <!-- ?v=... を付けると、古いCSSキャッシュではなく最新ファイルを読み込みやすくなります -->
+    <link rel="stylesheet" href="style.css?v=20260422-3" />
   </head>
   <body>
     <!-- サイトの最上部に表示する見出しエリアです -->
@@ -22,13 +31,13 @@
       <!-- 最初の画面で選べるメニューを2つ並べています -->
       <section class="menu-grid" aria-label="メインメニュー">
         <!-- 用語集ページへ移動するリンクカードです -->
-        <a class="menu-card" href="glossary.html">
+        <a class="menu-card" href="glossary.html?v=20260422-3">
           <h2>用語集</h2>
           <p>世界観で使われる基本用語を確認できます。</p>
         </a>
 
         <!-- 年表ページへ移動するリンクカードです -->
-        <a class="menu-card" href="timeline.html">
+        <a class="menu-card" href="timeline.html?v=20260422-3">
           <h2>年表</h2>
           <p>主な出来事を時系列で一覧できます。</p>
         </a>
