@@ -15,7 +15,7 @@
     <!-- ブラウザのタブに表示されるページ名 -->
     <title>作品ライブラリ | TYPEMOON資料館</title>
     <!-- 既存の共通デザインCSSを読み込みます -->
-    <link rel="stylesheet" href="style.css?v=20260424-1" />
+    <link rel="stylesheet" href="style.css?v=20260424-2" />
   </head>
   <body>
     <!-- ページ上部の見出しエリア -->
@@ -47,12 +47,34 @@
           </div>
         </div>
 
-        <!-- JavaScriptで生成した作品カードを、この中に追加していきます -->
-        <div id="works-list" class="works-grid"></div>
-        <!-- 結果が0件のときに表示するメッセージです -->
-        <p id="empty-message" class="works-empty" hidden>
-          条件に一致する作品はありません。
-        </p>
+        <!-- 左: リスト / 右: 詳細サイドパネル の2カラムレイアウトです -->
+        <div class="works-layout">
+          <div>
+            <!-- JavaScriptで生成した作品カードを、この中に追加していきます -->
+            <div id="works-list" class="works-grid"></div>
+            <!-- 結果が0件のときに表示するメッセージです -->
+            <p id="empty-message" class="works-empty" hidden>
+              条件に一致する作品はありません。
+            </p>
+          </div>
+
+          <!-- 作品名を押したときの詳細を表示するサイドパネルです -->
+          <aside id="detail-panel" class="work-detail-panel is-empty" aria-live="polite">
+            <div class="work-detail-header">
+              <h2 id="detail-title">作品を選択してください</h2>
+              <!-- このボタンを押すと、詳細表示を閉じて初期状態に戻します -->
+              <button id="close-panel-button" class="close-panel-button" type="button" disabled>
+                閉じる
+              </button>
+            </div>
+            <p id="detail-release-date" class="work-meta">発売日: -</p>
+            <p id="detail-category" class="work-meta">分類: -</p>
+            <p id="detail-summary" class="work-summary">
+              左側の作品名を押すと、ここに詳細情報が表示されます。
+            </p>
+            <p id="detail-description" class="work-detail-description" hidden></p>
+          </aside>
+        </div>
       </section>
 
       <!-- トップページへ戻るリンク -->
@@ -68,7 +90,8 @@
       //   title: "作品タイトル",
       //   releaseDate: "YYYY-MM-DD",
       //   category: "ゲーム / アニメ / 小説 など",
-      //   summary: "ここにあらすじを書きます。"
+      //   summary: "一覧カードに表示する短い説明です。",
+      //   description: "詳細パネルに表示する説明文です。（省略可）"
       // }
       const worksData = [
         {
@@ -76,35 +99,45 @@
           releaseDate: "2004-01-30",
           category: "ゲーム",
           summary:
-            "聖杯戦争に巻き込まれた少年・衛宮士郎が、サーヴァントとともに戦いへ身を投じる物語。"
+            "聖杯戦争に巻き込まれた少年・衛宮士郎が、サーヴァントとともに戦いへ身を投じる物語。",
+          description:
+            "3つのルートで物語が分岐し、それぞれ異なる視点で聖杯戦争の真実に迫っていく。TYPEMOONを代表する作品。"
         },
         {
           title: "Fate/Zero",
           releaseDate: "2011-10-02",
           category: "アニメ",
           summary:
-            "第四次聖杯戦争を舞台に、複数の魔術師と英霊の戦いを描く前日譚。"
+            "第四次聖杯戦争を舞台に、複数の魔術師と英霊の戦いを描く前日譚。",
+          description:
+            "『Fate/stay night』へ続く物語として、各陣営の信念と葛藤を重厚な群像劇で描いている。"
         },
         {
           title: "月姫 -A piece of blue glass moon-",
           releaseDate: "2021-08-26",
           category: "ゲーム",
           summary:
-            "異能の眼を持つ遠野志貴が、吸血鬼事件の渦中で自身の過去と向き合っていく伝奇作品。"
+            "異能の眼を持つ遠野志貴が、吸血鬼事件の渦中で自身の過去と向き合っていく伝奇作品。",
+          description:
+            "ビジュアル・演出を刷新したリメイク版。伝奇ホラーと青春劇の要素が融合した独特の世界観が特徴。"
         },
         {
           title: "Fate/Grand Order",
           releaseDate: "2015-07-30",
           category: "ゲーム",
           summary:
-            "人理焼却を阻止するため、時代を超えて英霊とともに特異点を巡る長編RPG。"
+            "人理焼却を阻止するため、時代を超えて英霊とともに特異点を巡る長編RPG。",
+          description:
+            "多数のシナリオライターによる章構成で、歴史・神話の英霊たちと協力しながら世界の危機に挑む。"
         },
         {
           title: "空の境界",
           releaseDate: "2004-06-01",
           category: "小説",
           summary:
-            "両儀式を中心に、超常事件と人間の内面を描いた伝奇小説シリーズ。"
+            "両儀式を中心に、超常事件と人間の内面を描いた伝奇小説シリーズ。",
+          description:
+            "時系列が複雑に組まれた構成と、静かで鋭い文体が魅力。TYPEMOON作品群の原点のひとつ。"
         }
       ];
 
@@ -116,6 +149,19 @@
       const categorySelectElement = document.getElementById("category-select");
       // 結果0件メッセージの要素を取得します。
       const emptyMessageElement = document.getElementById("empty-message");
+      // 詳細サイドパネル関連の要素を取得します。
+      const detailPanelElement = document.getElementById("detail-panel");
+      const detailTitleElement = document.getElementById("detail-title");
+      const detailReleaseDateElement = document.getElementById("detail-release-date");
+      const detailCategoryElement = document.getElementById("detail-category");
+      const detailSummaryElement = document.getElementById("detail-summary");
+      const detailDescriptionElement = document.getElementById("detail-description");
+      const closePanelButtonElement = document.getElementById("close-panel-button");
+
+      // いま詳細表示中の作品タイトルを保持します。
+      let selectedWorkTitle = null;
+      // 現在画面に表示している一覧データを保持します（選択状態の再描画に使います）。
+      let currentDisplayedWorks = [];
 
       // カテゴリの候補を、配列データから重複なしで取り出して作ります。
       const categories = [...new Set(worksData.map((work) => work.category))];
@@ -128,23 +174,73 @@
         categorySelectElement.appendChild(option);
       });
 
+      // 詳細パネルを初期状態（未選択）に戻す関数です。
+      function resetDetailPanel() {
+        detailPanelElement.classList.add("is-empty");
+        detailTitleElement.textContent = "作品を選択してください";
+        detailReleaseDateElement.textContent = "発売日: -";
+        detailCategoryElement.textContent = "分類: -";
+        detailSummaryElement.textContent =
+          "左側の作品名を押すと、ここに詳細情報が表示されます。";
+        detailDescriptionElement.textContent = "";
+        detailDescriptionElement.hidden = true;
+        closePanelButtonElement.disabled = true;
+      }
+
+      // 作品データを受け取り、詳細サイドパネルに表示する関数です。
+      function showDetailPanel(work) {
+        detailPanelElement.classList.remove("is-empty");
+        detailTitleElement.textContent = work.title;
+        detailReleaseDateElement.textContent = `発売日: ${work.releaseDate}`;
+        detailCategoryElement.textContent = `分類: ${work.category}`;
+        detailSummaryElement.textContent = work.summary;
+        detailDescriptionElement.textContent = work.description || "";
+        detailDescriptionElement.hidden = !work.description;
+        closePanelButtonElement.disabled = false;
+      }
+
       // 受け取った作品データ配列を画面に描画する関数です。
       function renderWorks(works) {
         // いったん表示を空にしてから、最新の結果だけ表示します。
         worksListElement.innerHTML = "";
+        currentDisplayedWorks = works;
 
         works.forEach((work) => {
           // articleタグで、作品1件分のまとまりを表します。
           const card = document.createElement("article");
           card.className = "work-card";
+          if (work.title === selectedWorkTitle) {
+            card.classList.add("is-selected");
+          }
 
-          // innerHTMLで、カードの中身をまとめて作ります。
-          card.innerHTML = `
-            <h2>${work.title}</h2>
-            <p class="work-meta">発売日: ${work.releaseDate}</p>
-            <p class="work-meta">分類: ${work.category}</p>
-            <p class="work-summary">${work.summary}</p>
-          `;
+          // 作品名はボタンにして、押すと右側パネルに詳細を表示できるようにします。
+          const titleButton = document.createElement("button");
+          titleButton.type = "button";
+          titleButton.className = "work-title-button";
+          titleButton.textContent = work.title;
+          titleButton.addEventListener("click", () => {
+            selectedWorkTitle = work.title;
+            showDetailPanel(work);
+            // 選択中のカードを見た目で分かるように再描画します。
+            renderWorks(currentDisplayedWorks);
+          });
+
+          const releaseDateElement = document.createElement("p");
+          releaseDateElement.className = "work-meta";
+          releaseDateElement.textContent = `発売日: ${work.releaseDate}`;
+
+          const categoryElement = document.createElement("p");
+          categoryElement.className = "work-meta";
+          categoryElement.textContent = `分類: ${work.category}`;
+
+          const summaryElement = document.createElement("p");
+          summaryElement.className = "work-summary";
+          summaryElement.textContent = work.summary;
+
+          card.appendChild(titleButton);
+          card.appendChild(releaseDateElement);
+          card.appendChild(categoryElement);
+          card.appendChild(summaryElement);
 
           // 作ったカードを一覧エリアの最後に追加します。
           worksListElement.appendChild(card);
@@ -173,14 +269,31 @@
           })
           .sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
 
+        // 絞り込み後の一覧に選択中の作品が存在しない場合、詳細表示を閉じます。
+        const selectedWork = filteredAndSortedWorks.find(
+          (work) => work.title === selectedWorkTitle
+        );
+        if (!selectedWork) {
+          selectedWorkTitle = null;
+          resetDetailPanel();
+        } else {
+          showDetailPanel(selectedWork);
+        }
+
         renderWorks(filteredAndSortedWorks);
       }
 
       // 入力が変わるたびに再描画します。
       searchInputElement.addEventListener("input", updateWorksView);
       categorySelectElement.addEventListener("change", updateWorksView);
+      closePanelButtonElement.addEventListener("click", () => {
+        selectedWorkTitle = null;
+        resetDetailPanel();
+        renderWorks(currentDisplayedWorks);
+      });
 
       // 初期表示時も、同じ処理で表示します。
+      resetDetailPanel();
       updateWorksView();
     </script>
   </body>
