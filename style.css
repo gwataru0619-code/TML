@@ -46,6 +46,35 @@ a {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
+.works-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.work-card {
+  background: rgba(15, 23, 42, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.work-card h2 {
+  margin: 0 0 8px;
+  color: #e0f2fe;
+}
+
+.work-meta {
+  margin: 0;
+  color: #93c5fd;
+  font-size: 0.95rem;
+}
+
+.work-summary {
+  margin: 12px 0 0;
+  line-height: 1.7;
+  color: #cbd5e1;
+}
+
 .menu-card {
   display: block;
   text-decoration: none;
