@@ -15,7 +15,7 @@
     <!-- ブラウザのタブに表示されるページ名 -->
     <title>キャラクター一覧 | TYPEMOON資料館</title>
     <!-- 共通デザインCSSを読み込みます -->
-    <link rel="stylesheet" href="style.css?v=20260424-3" />
+    <link rel="stylesheet" href="style.css?v=20260424-4" />
   </head>
   <body>
     <!-- ページ上部の見出しエリア -->
@@ -84,6 +84,11 @@
               左側の名前を押すと、ここに詳細情報が表示されます。
             </p>
             <p id="character-detail-description" class="work-detail-description" hidden></p>
+            <!-- 詳細パネルの中に、登場作品へのリンクを表示します -->
+            <p class="relation-label">登場作品</p>
+            <div id="character-detail-works" class="relation-links">
+              <span class="relation-empty">キャラクターを選択すると表示されます。</span>
+            </div>
           </aside>
         </div>
       </section>
@@ -102,7 +107,8 @@
       //   firstAppearance: "YYYY-MM-DD",
       //   role: "主人公 / サーヴァント / 魔術師 など",
       //   summary: "一覧カードに表示する短い説明です。",
-      //   description: "詳細パネルに表示する説明文です。（省略可）"
+      //   description: "詳細パネルに表示する説明文です。（省略可）",
+      //   works: ["登場作品1", "登場作品2"]
       // }
       const charactersData = [
         {
@@ -112,7 +118,8 @@
           summary:
             "『Fate/stay night』の主人公。正義の味方を目指し、聖杯戦争に参加する。",
           description:
-            "幼い頃の大火災をきっかけに、誰かを救う生き方を選んだ少年。複数ルートで異なる成長を見せる。"
+            "幼い頃の大火災をきっかけに、誰かを救う生き方を選んだ少年。複数ルートで異なる成長を見せる。",
+          works: ["Fate/stay night", "Fate/Grand Order"]
         },
         {
           name: "セイバー",
@@ -121,7 +128,8 @@
           summary:
             "士郎と契約する剣士のサーヴァント。高い戦闘能力と誇り高い精神を持つ。",
           description:
-            "騎士王としての責務と個人の願いの間で葛藤する。Fateシリーズを象徴する人気キャラクター。"
+            "騎士王としての責務と個人の願いの間で葛藤する。Fateシリーズを象徴する人気キャラクター。",
+          works: ["Fate/stay night", "Fate/Zero", "Fate/Grand Order"]
         },
         {
           name: "遠坂凛",
@@ -130,7 +138,8 @@
           summary:
             "遠坂家の後継者として聖杯戦争に挑む優秀な魔術師。",
           description:
-            "冷静な判断力と行動力を持ち、時に厳しく時に面倒見のよい性格で物語を引っ張る。"
+            "冷静な判断力と行動力を持ち、時に厳しく時に面倒見のよい性格で物語を引っ張る。",
+          works: ["Fate/stay night", "Fate/Grand Order"]
         },
         {
           name: "両儀式",
@@ -139,7 +148,8 @@
           summary:
             "『空の境界』の主人公。直死の魔眼を持ち、怪異事件に立ち向かう。",
           description:
-            "静かな佇まいの中に強い意志を持つ人物。死の概念を視る力で常識外れの戦いを可能にする。"
+            "静かな佇まいの中に強い意志を持つ人物。死の概念を視る力で常識外れの戦いを可能にする。",
+          works: ["空の境界", "Fate/Grand Order"]
         },
         {
           name: "アルクェイド・ブリュンスタッド",
@@ -148,9 +158,14 @@
           summary:
             "『月姫』のメインヒロイン。真祖として圧倒的な力を持つ吸血鬼。",
           description:
-            "無邪気さと強大な存在感を併せ持ち、主人公・遠野志貴の運命を大きく変える存在。"
+            "無邪気さと強大な存在感を併せ持ち、主人公・遠野志貴の運命を大きく変える存在。",
+          works: ["月姫 -A piece of blue glass moon-", "Fate/Grand Order"]
         }
       ];
+
+      // URLに ?character=キャラ名 があるとき、そのキャラを初期表示で開くために取得します。
+      const initialQueryCharacterName =
+        new URLSearchParams(window.location.search).get("character");
 
       // id="characters-list" の要素を取得します。
       const charactersListElement = document.getElementById("characters-list");
@@ -186,6 +201,9 @@
       const characterDetailDescriptionElement = document.getElementById(
         "character-detail-description"
       );
+      const characterDetailWorksElement = document.getElementById(
+        "character-detail-works"
+      );
       const characterClosePanelButtonElement = document.getElementById(
         "character-close-panel-button"
       );
@@ -194,6 +212,10 @@
       let selectedCharacterName = null;
       // 現在画面に表示している一覧データを保持します（選択状態の再描画に使います）。
       let currentDisplayedCharacters = [];
+      // 初回表示でURL指定のキャラへスクロールするためのフラグです。
+      let shouldScrollToSelectedCharacter = false;
+      // URLの初期指定は1回だけ使いたいので、可変の変数に入れます。
+      let pendingInitialCharacterName = initialQueryCharacterName;
 
       // 役割カテゴリの候補を、配列データから重複なしで取り出して作ります。
       const roles = [...new Set(charactersData.map((character) => character.role))];
@@ -206,6 +228,30 @@
         characterRoleSelectElement.appendChild(option);
       });
 
+      // 指定されたリンク一覧を描画する関数です（登場作品リンク用）。
+      function renderRelationLinks(container, items, createLinkElement, emptyText) {
+        container.innerHTML = "";
+        if (!items || items.length === 0) {
+          const emptyLabel = document.createElement("span");
+          emptyLabel.className = "relation-empty";
+          emptyLabel.textContent = emptyText;
+          container.appendChild(emptyLabel);
+          return;
+        }
+        items.forEach((item) => {
+          container.appendChild(createLinkElement(item));
+        });
+      }
+
+      // 作品名から、作品ライブラリへのリンク要素を作る関数です。
+      function createWorkLinkElement(workTitle) {
+        const link = document.createElement("a");
+        link.className = "relation-link";
+        link.href = `works.html?v=20260424-4&work=${encodeURIComponent(workTitle)}`;
+        link.textContent = workTitle;
+        return link;
+      }
+
       // 詳細パネルを初期状態（未選択）に戻す関数です。
       function resetCharacterDetailPanel() {
         characterDetailPanelElement.classList.add("is-empty");
@@ -217,6 +263,12 @@
         characterDetailDescriptionElement.textContent = "";
         characterDetailDescriptionElement.hidden = true;
         characterClosePanelButtonElement.disabled = true;
+        renderRelationLinks(
+          characterDetailWorksElement,
+          [],
+          createWorkLinkElement,
+          "キャラクターを選択すると表示されます。"
+        );
       }
 
       // キャラクターデータを受け取り、詳細サイドパネルに表示する関数です。
@@ -229,6 +281,22 @@
         characterDetailDescriptionElement.textContent = character.description || "";
         characterDetailDescriptionElement.hidden = !character.description;
         characterClosePanelButtonElement.disabled = false;
+        renderRelationLinks(
+          characterDetailWorksElement,
+          character.works,
+          createWorkLinkElement,
+          "登録なし"
+        );
+      }
+
+      // 選択中カードを見える位置までスクロールする関数です。
+      function scrollToSelectedCharacterCard() {
+        const selectedCard = charactersListElement.querySelector(
+          ".work-card.is-selected"
+        );
+        if (selectedCard) {
+          selectedCard.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       }
 
       // 受け取ったキャラクターデータ配列を画面に描画する関数です。
@@ -280,6 +348,12 @@
 
         // 結果が0件ならメッセージを表示し、1件以上なら隠します。
         charactersEmptyMessageElement.hidden = characters.length !== 0;
+
+        // URL指定などでスクロールしたいタイミングだけ実行します。
+        if (shouldScrollToSelectedCharacter) {
+          scrollToSelectedCharacterCard();
+          shouldScrollToSelectedCharacter = false;
+        }
       }
 
       // 検索・絞り込み条件を使って、表示するキャラクターを作る関数です。
@@ -307,15 +381,31 @@
               new Date(a.firstAppearance) - new Date(b.firstAppearance)
           );
 
-        // 絞り込み後の一覧に選択中のキャラクターが存在しない場合、詳細表示を閉じます。
-        const selectedCharacter = filteredAndSortedCharacters.find(
-          (character) => character.name === selectedCharacterName
-        );
-        if (!selectedCharacter) {
-          selectedCharacterName = null;
-          resetCharacterDetailPanel();
+        // URLに指定されたキャラ名がある場合は、初回だけそのキャラを選択します。
+        if (pendingInitialCharacterName) {
+          const initialCharacter = filteredAndSortedCharacters.find(
+            (character) => character.name === pendingInitialCharacterName
+          );
+          if (initialCharacter) {
+            selectedCharacterName = initialCharacter.name;
+            showCharacterDetailPanel(initialCharacter);
+            shouldScrollToSelectedCharacter = true;
+          } else {
+            selectedCharacterName = null;
+            resetCharacterDetailPanel();
+          }
+          pendingInitialCharacterName = null;
         } else {
-          showCharacterDetailPanel(selectedCharacter);
+          // 絞り込み後の一覧に選択中のキャラクターが存在しない場合、詳細表示を閉じます。
+          const selectedCharacter = filteredAndSortedCharacters.find(
+            (character) => character.name === selectedCharacterName
+          );
+          if (!selectedCharacter) {
+            selectedCharacterName = null;
+            resetCharacterDetailPanel();
+          } else {
+            showCharacterDetailPanel(selectedCharacter);
+          }
         }
 
         renderCharacters(filteredAndSortedCharacters);

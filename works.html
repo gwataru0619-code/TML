@@ -15,7 +15,7 @@
     <!-- ブラウザのタブに表示されるページ名 -->
     <title>作品ライブラリ | TYPEMOON資料館</title>
     <!-- 既存の共通デザインCSSを読み込みます -->
-    <link rel="stylesheet" href="style.css?v=20260424-3" />
+    <link rel="stylesheet" href="style.css?v=20260424-4" />
   </head>
   <body>
     <!-- ページ上部の見出しエリア -->
@@ -59,11 +59,20 @@
           </div>
 
           <!-- 作品名を押したときの詳細を表示するサイドパネルです -->
-          <aside id="detail-panel" class="work-detail-panel is-empty" aria-live="polite">
+          <aside
+            id="detail-panel"
+            class="work-detail-panel is-empty"
+            aria-live="polite"
+          >
             <div class="work-detail-header">
               <h2 id="detail-title">作品を選択してください</h2>
               <!-- このボタンを押すと、詳細表示を閉じて初期状態に戻します -->
-              <button id="close-panel-button" class="close-panel-button" type="button" disabled>
+              <button
+                id="close-panel-button"
+                class="close-panel-button"
+                type="button"
+                disabled
+              >
                 閉じる
               </button>
             </div>
@@ -73,12 +82,18 @@
               左側の作品名を押すと、ここに詳細情報が表示されます。
             </p>
             <p id="detail-description" class="work-detail-description" hidden></p>
+
+            <!-- 詳細パネルの中に、登場キャラクターへのリンクを表示します -->
+            <p class="relation-label">登場キャラクター</p>
+            <div id="detail-characters" class="relation-links">
+              <span class="relation-empty">作品を選択すると表示されます。</span>
+            </div>
           </aside>
         </div>
       </section>
 
       <!-- トップページへ戻るリンク -->
-      <p><a class="back-link" href="index.html?v=20260424-3">トップへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260424-4">トップへ戻る</a></p>
     </main>
 
     <script>
@@ -91,7 +106,8 @@
       //   releaseDate: "YYYY-MM-DD",
       //   category: "ゲーム / アニメ / 小説 など",
       //   summary: "一覧カードに表示する短い説明です。",
-      //   description: "詳細パネルに表示する説明文です。（省略可）"
+      //   description: "詳細パネルに表示する説明文です。（省略可）",
+      //   characters: ["登場キャラクター名1", "登場キャラクター名2"]
       // }
       const worksData = [
         {
@@ -101,7 +117,8 @@
           summary:
             "聖杯戦争に巻き込まれた少年・衛宮士郎が、サーヴァントとともに戦いへ身を投じる物語。",
           description:
-            "3つのルートで物語が分岐し、それぞれ異なる視点で聖杯戦争の真実に迫っていく。TYPEMOONを代表する作品。"
+            "3つのルートで物語が分岐し、それぞれ異なる視点で聖杯戦争の真実に迫っていく。TYPEMOONを代表する作品。",
+          characters: ["衛宮士郎", "セイバー", "遠坂凛"]
         },
         {
           title: "Fate/Zero",
@@ -110,7 +127,8 @@
           summary:
             "第四次聖杯戦争を舞台に、複数の魔術師と英霊の戦いを描く前日譚。",
           description:
-            "『Fate/stay night』へ続く物語として、各陣営の信念と葛藤を重厚な群像劇で描いている。"
+            "『Fate/stay night』へ続く物語として、各陣営の信念と葛藤を重厚な群像劇で描いている。",
+          characters: ["セイバー"]
         },
         {
           title: "月姫 -A piece of blue glass moon-",
@@ -119,7 +137,8 @@
           summary:
             "異能の眼を持つ遠野志貴が、吸血鬼事件の渦中で自身の過去と向き合っていく伝奇作品。",
           description:
-            "ビジュアル・演出を刷新したリメイク版。伝奇ホラーと青春劇の要素が融合した独特の世界観が特徴。"
+            "ビジュアル・演出を刷新したリメイク版。伝奇ホラーと青春劇の要素が融合した独特の世界観が特徴。",
+          characters: ["アルクェイド・ブリュンスタッド"]
         },
         {
           title: "Fate/Grand Order",
@@ -128,7 +147,14 @@
           summary:
             "人理焼却を阻止するため、時代を超えて英霊とともに特異点を巡る長編RPG。",
           description:
-            "多数のシナリオライターによる章構成で、歴史・神話の英霊たちと協力しながら世界の危機に挑む。"
+            "多数のシナリオライターによる章構成で、歴史・神話の英霊たちと協力しながら世界の危機に挑む。",
+          characters: [
+            "衛宮士郎",
+            "セイバー",
+            "遠坂凛",
+            "両儀式",
+            "アルクェイド・ブリュンスタッド"
+          ]
         },
         {
           title: "空の境界",
@@ -137,9 +163,14 @@
           summary:
             "両儀式を中心に、超常事件と人間の内面を描いた伝奇小説シリーズ。",
           description:
-            "時系列が複雑に組まれた構成と、静かで鋭い文体が魅力。TYPEMOON作品群の原点のひとつ。"
+            "時系列が複雑に組まれた構成と、静かで鋭い文体が魅力。TYPEMOON作品群の原点のひとつ。",
+          characters: ["両儀式"]
         }
       ];
+
+      // URLに ?work=作品名 があるとき、その作品を初期表示で開くために取得します。
+      const initialQueryWorkTitle =
+        new URLSearchParams(window.location.search).get("work");
 
       // id="works-list" の要素を取得します。
       const worksListElement = document.getElementById("works-list");
@@ -156,12 +187,34 @@
       const detailCategoryElement = document.getElementById("detail-category");
       const detailSummaryElement = document.getElementById("detail-summary");
       const detailDescriptionElement = document.getElementById("detail-description");
+      const detailCharactersElement = document.getElementById("detail-characters");
       const closePanelButtonElement = document.getElementById("close-panel-button");
 
       // いま詳細表示中の作品タイトルを保持します。
       let selectedWorkTitle = null;
       // 現在画面に表示している一覧データを保持します（選択状態の再描画に使います）。
       let currentDisplayedWorks = [];
+      // 初回表示でURL指定の作品へスクロールするためのフラグです。
+      let shouldScrollToSelectedWork = false;
+      // URLの初期指定は1回だけ使いたいので、可変の変数に入れます。
+      let pendingInitialWorkTitle = initialQueryWorkTitle;
+      // URLパラメータの作品名を元に、検索条件を自動調整する関数です。
+      function applyInitialWorkSelectionFromQuery() {
+        if (!pendingInitialWorkTitle) {
+          return;
+        }
+        const targetWork = worksData.find(
+          (work) => work.title === pendingInitialWorkTitle
+        );
+        if (!targetWork) {
+          pendingInitialWorkTitle = null;
+          return;
+        }
+        // 該当作品が確実に表示されるように、検索欄とカテゴリをあわせて設定します。
+        searchInputElement.value = targetWork.title;
+        categorySelectElement.value = targetWork.category;
+      }
+
 
       // カテゴリの候補を、配列データから重複なしで取り出して作ります。
       const categories = [...new Set(worksData.map((work) => work.category))];
@@ -174,6 +227,32 @@
         categorySelectElement.appendChild(option);
       });
 
+      // 指定されたリンク一覧を描画する関数です（キャラクター名リンク用）。
+      function renderRelationLinks(container, items, createLinkElement, emptyText) {
+        container.innerHTML = "";
+        if (!items || items.length === 0) {
+          const emptyLabel = document.createElement("span");
+          emptyLabel.className = "relation-empty";
+          emptyLabel.textContent = emptyText;
+          container.appendChild(emptyLabel);
+          return;
+        }
+        items.forEach((item) => {
+          container.appendChild(createLinkElement(item));
+        });
+      }
+
+      // キャラクター名から、キャラクター一覧へのリンク要素を作る関数です。
+      function createCharacterLinkElement(characterName) {
+        const link = document.createElement("a");
+        link.className = "relation-link";
+        link.href = `characters.html?v=20260424-4&character=${encodeURIComponent(
+          characterName
+        )}`;
+        link.textContent = characterName;
+        return link;
+      }
+
       // 詳細パネルを初期状態（未選択）に戻す関数です。
       function resetDetailPanel() {
         detailPanelElement.classList.add("is-empty");
@@ -185,6 +264,12 @@
         detailDescriptionElement.textContent = "";
         detailDescriptionElement.hidden = true;
         closePanelButtonElement.disabled = true;
+        renderRelationLinks(
+          detailCharactersElement,
+          [],
+          createCharacterLinkElement,
+          "作品を選択すると表示されます。"
+        );
       }
 
       // 作品データを受け取り、詳細サイドパネルに表示する関数です。
@@ -197,6 +282,20 @@
         detailDescriptionElement.textContent = work.description || "";
         detailDescriptionElement.hidden = !work.description;
         closePanelButtonElement.disabled = false;
+        renderRelationLinks(
+          detailCharactersElement,
+          work.characters,
+          createCharacterLinkElement,
+          "登録なし"
+        );
+      }
+
+      // 選択中カードを見える位置までスクロールする関数です。
+      function scrollToSelectedWorkCard() {
+        const selectedCard = worksListElement.querySelector(".work-card.is-selected");
+        if (selectedCard) {
+          selectedCard.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       }
 
       // 受け取った作品データ配列を画面に描画する関数です。
@@ -248,6 +347,12 @@
 
         // 結果が0件ならメッセージを表示し、1件以上なら隠します。
         emptyMessageElement.hidden = works.length !== 0;
+
+        // URL指定などでスクロールしたいタイミングだけ実行します。
+        if (shouldScrollToSelectedWork) {
+          scrollToSelectedWorkCard();
+          shouldScrollToSelectedWork = false;
+        }
       }
 
       // 検索・絞り込み条件を使って、表示する作品を作る関数です。
@@ -264,20 +369,37 @@
               selectedCategory === "all" || work.category === selectedCategory;
             const isSearchMatched =
               work.title.toLowerCase().includes(searchKeyword) ||
-              work.summary.toLowerCase().includes(searchKeyword);
+              work.summary.toLowerCase().includes(searchKeyword) ||
+              (work.description || "").toLowerCase().includes(searchKeyword);
             return isCategoryMatched && isSearchMatched;
           })
           .sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
 
-        // 絞り込み後の一覧に選択中の作品が存在しない場合、詳細表示を閉じます。
-        const selectedWork = filteredAndSortedWorks.find(
-          (work) => work.title === selectedWorkTitle
-        );
-        if (!selectedWork) {
-          selectedWorkTitle = null;
-          resetDetailPanel();
+        // URLに指定された作品名がある場合は、初回だけその作品を選択します。
+        if (pendingInitialWorkTitle) {
+          const initialWork = filteredAndSortedWorks.find(
+            (work) => work.title === pendingInitialWorkTitle
+          );
+          if (initialWork) {
+            selectedWorkTitle = initialWork.title;
+            showDetailPanel(initialWork);
+            shouldScrollToSelectedWork = true;
+          } else {
+            selectedWorkTitle = null;
+            resetDetailPanel();
+          }
+          pendingInitialWorkTitle = null;
         } else {
-          showDetailPanel(selectedWork);
+          // 絞り込み後の一覧に選択中の作品が存在しない場合、詳細表示を閉じます。
+          const selectedWork = filteredAndSortedWorks.find(
+            (work) => work.title === selectedWorkTitle
+          );
+          if (!selectedWork) {
+            selectedWorkTitle = null;
+            resetDetailPanel();
+          } else {
+            showDetailPanel(selectedWork);
+          }
         }
 
         renderWorks(filteredAndSortedWorks);
@@ -293,6 +415,7 @@
       });
 
       // 初期表示時も、同じ処理で表示します。
+      applyInitialWorkSelectionFromQuery();
       resetDetailPanel();
       updateWorksView();
     </script>
