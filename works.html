@@ -15,7 +15,7 @@
     <!-- ブラウザのタブに表示されるページ名 -->
     <title>作品ライブラリ | TYPEMOON資料館</title>
     <!-- 既存の共通デザインCSSを読み込みます -->
-    <link rel="stylesheet" href="style.css?v=20260422-5" />
+    <link rel="stylesheet" href="style.css?v=20260424-1" />
   </head>
   <body>
     <!-- ページ上部の見出しエリア -->
@@ -26,12 +26,37 @@
 
     <main class="container">
       <section class="content-card">
+        <!-- ここは検索と絞り込みの操作エリアです -->
+        <div class="works-controls" aria-label="作品の検索と絞り込み">
+          <div class="works-controls-row">
+            <label class="works-control-label" for="search-input">
+              検索
+              <input
+                id="search-input"
+                type="search"
+                placeholder="タイトル・あらすじで検索"
+              />
+            </label>
+
+            <label class="works-control-label" for="category-select">
+              カテゴリ
+              <select id="category-select">
+                <option value="all">すべて</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
         <!-- JavaScriptで生成した作品カードを、この中に追加していきます -->
         <div id="works-list" class="works-grid"></div>
+        <!-- 結果が0件のときに表示するメッセージです -->
+        <p id="empty-message" class="works-empty" hidden>
+          条件に一致する作品はありません。
+        </p>
       </section>
 
       <!-- トップページへ戻るリンク -->
-      <p><a class="back-link" href="index.html?v=20260422-5">トップへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260424-1">トップへ戻る</a></p>
     </main>
 
     <script>
@@ -49,46 +74,114 @@
         {
           title: "Fate/stay night",
           releaseDate: "2004-01-30",
-          category: "PCゲーム",
+          category: "ゲーム",
           summary:
             "聖杯戦争に巻き込まれた少年・衛宮士郎が、サーヴァントとともに戦いへ身を投じる物語。"
         },
         {
+          title: "Fate/Zero",
+          releaseDate: "2011-10-02",
+          category: "アニメ",
+          summary:
+            "第四次聖杯戦争を舞台に、複数の魔術師と英霊の戦いを描く前日譚。"
+        },
+        {
           title: "月姫 -A piece of blue glass moon-",
           releaseDate: "2021-08-26",
-          category: "PS4 / Nintendo Switch",
+          category: "ゲーム",
           summary:
             "異能の眼を持つ遠野志貴が、吸血鬼事件の渦中で自身の過去と向き合っていく伝奇作品。"
         },
         {
           title: "Fate/Grand Order",
           releaseDate: "2015-07-30",
-          category: "スマートフォンゲーム",
+          category: "ゲーム",
           summary:
             "人理焼却を阻止するため、時代を超えて英霊とともに特異点を巡る長編RPG。"
+        },
+        {
+          title: "空の境界",
+          releaseDate: "2004-06-01",
+          category: "小説",
+          summary:
+            "両儀式を中心に、超常事件と人間の内面を描いた伝奇小説シリーズ。"
         }
       ];
 
       // id="works-list" の要素を取得します。
       const worksListElement = document.getElementById("works-list");
+      // 検索ボックスの要素を取得します。
+      const searchInputElement = document.getElementById("search-input");
+      // カテゴリ選択の要素を取得します。
+      const categorySelectElement = document.getElementById("category-select");
+      // 結果0件メッセージの要素を取得します。
+      const emptyMessageElement = document.getElementById("empty-message");
 
-      // データ配列を先頭から順番に処理して、1件ずつHTMLカードを作ります。
-      worksData.forEach((work) => {
-        // articleタグで、作品1件分のまとまりを表します。
-        const card = document.createElement("article");
-        card.className = "work-card";
+      // カテゴリの候補を、配列データから重複なしで取り出して作ります。
+      const categories = [...new Set(worksData.map((work) => work.category))];
 
-        // innerHTMLで、カードの中身をまとめて作ります。
-        card.innerHTML = `
-          <h2>${work.title}</h2>
-          <p class="work-meta">発売日: ${work.releaseDate}</p>
-          <p class="work-meta">分類: ${work.category}</p>
-          <p class="work-summary">${work.summary}</p>
-        `;
-
-        // 作ったカードを一覧エリアの最後に追加します。
-        worksListElement.appendChild(card);
+      // category-select にカテゴリ選択肢を追加します。
+      categories.forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categorySelectElement.appendChild(option);
       });
+
+      // 受け取った作品データ配列を画面に描画する関数です。
+      function renderWorks(works) {
+        // いったん表示を空にしてから、最新の結果だけ表示します。
+        worksListElement.innerHTML = "";
+
+        works.forEach((work) => {
+          // articleタグで、作品1件分のまとまりを表します。
+          const card = document.createElement("article");
+          card.className = "work-card";
+
+          // innerHTMLで、カードの中身をまとめて作ります。
+          card.innerHTML = `
+            <h2>${work.title}</h2>
+            <p class="work-meta">発売日: ${work.releaseDate}</p>
+            <p class="work-meta">分類: ${work.category}</p>
+            <p class="work-summary">${work.summary}</p>
+          `;
+
+          // 作ったカードを一覧エリアの最後に追加します。
+          worksListElement.appendChild(card);
+        });
+
+        // 結果が0件ならメッセージを表示し、1件以上なら隠します。
+        emptyMessageElement.hidden = works.length !== 0;
+      }
+
+      // 検索・絞り込み条件を使って、表示する作品を作る関数です。
+      function updateWorksView() {
+        const searchKeyword = searchInputElement.value.trim().toLowerCase();
+        const selectedCategory = categorySelectElement.value;
+
+        // 1) カテゴリで絞り込み
+        // 2) タイトルとあらすじで検索
+        // 3) 発売日の古い順（年代順）にソート
+        const filteredAndSortedWorks = worksData
+          .filter((work) => {
+            const isCategoryMatched =
+              selectedCategory === "all" || work.category === selectedCategory;
+            const isSearchMatched =
+              work.title.toLowerCase().includes(searchKeyword) ||
+              work.summary.toLowerCase().includes(searchKeyword);
+            return isCategoryMatched && isSearchMatched;
+          })
+          .sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+
+        renderWorks(filteredAndSortedWorks);
+      }
+
+      // 入力が変わるたびに再描画します。
+      searchInputElement.addEventListener("input", updateWorksView);
+      categorySelectElement.addEventListener("change", updateWorksView);
+
+      // 初期表示時も、同じ処理で表示します。
+      updateWorksView();
     </script>
   </body>
 </html>

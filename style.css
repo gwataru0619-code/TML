@@ -51,6 +51,48 @@ a {
   gap: 18px;
 }
 
+.works-controls {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.works-controls-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.works-control-label {
+  display: grid;
+  gap: 6px;
+  color: #cbd5e1;
+  font-size: 0.92rem;
+}
+
+.works-control-label input,
+.works-control-label select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.65);
+  color: #e2e8f0;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.works-control-label input::placeholder {
+  color: #94a3b8;
+}
+
+.works-empty {
+  margin: 0;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px dashed rgba(148, 163, 184, 0.45);
+  color: #cbd5e1;
+}
+
 .work-card {
   background: rgba(15, 23, 42, 0.62);
   border: 1px solid rgba(148, 163, 184, 0.4);
