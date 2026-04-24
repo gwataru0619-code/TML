@@ -14,10 +14,12 @@
     />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <!-- 共通デザインを読み込むCSSファイル（?v=20260422-4 はキャッシュ対策） -->
-    <link rel="stylesheet" href="style.css?v=20260422-4" />
+    <!-- 共通デザインを読み込むCSSファイル -->
+    <link rel="stylesheet" href="style.css?v=20260424-5" />
   </head>
   <body>
+    <!-- 画面上端のハンバーガーメニューです（共通JSで生成します） -->
+    <div id="site-menu"></div>
     <!-- ページ上部の見出しエリア -->
     <header class="site-header">
       <!-- このページのタイトル -->
@@ -55,7 +57,9 @@
       </section>
 
       <!-- トップページへ戻るためのリンク -->
-      <p><a class="back-link" href="index.html?v=20260422-4">トップページへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260424-5">トップページへ戻る</a></p>
     </main>
+    <!-- 共通ハンバーガーメニューを生成するJavaScriptを読み込みます -->
+    <script src="menu.js?v=20260424-5"></script>
   </body>
 </html>

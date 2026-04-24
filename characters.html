@@ -15,9 +15,12 @@
     <!-- ブラウザのタブに表示されるページ名 -->
     <title>キャラクター一覧 | TYPEMOON資料館</title>
     <!-- 共通デザインCSSを読み込みます -->
-    <link rel="stylesheet" href="style.css?v=20260424-4" />
+    <link rel="stylesheet" href="style.css?v=20260424-5" />
   </head>
   <body>
+    <!-- menu.js がこの位置にハンバーガーメニューを自動挿入します -->
+    <div id="site-menu"></div>
+
     <!-- ページ上部の見出しエリア -->
     <header class="site-header">
       <h1>キャラクター一覧</h1>
@@ -94,7 +97,7 @@
       </section>
 
       <!-- トップページへ戻るリンク -->
-      <p><a class="back-link" href="index.html?v=20260424-3">トップへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260424-5">トップへ戻る</a></p>
     </main>
 
     <script>
@@ -247,7 +250,7 @@
       function createWorkLinkElement(workTitle) {
         const link = document.createElement("a");
         link.className = "relation-link";
-        link.href = `works.html?v=20260424-4&work=${encodeURIComponent(workTitle)}`;
+        link.href = `works.html?v=20260424-5&work=${encodeURIComponent(workTitle)}`;
         link.textContent = workTitle;
         return link;
       }
@@ -424,5 +427,8 @@
       resetCharacterDetailPanel();
       updateCharactersView();
     </script>
+
+    <!-- 共通ハンバーガーメニューを生成するJavaScriptを読み込みます -->
+    <script src="menu.js?v=20260424-5"></script>
   </body>
 </html>
