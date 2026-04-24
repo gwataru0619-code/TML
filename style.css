@@ -484,14 +484,7 @@ a {
   line-height: 1.7;
 }
 
-.glossary-category-labels {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.glossary-category-label {
+.glossary-category-chip {
   display: inline-block;
   border: 1px solid rgba(125, 211, 252, 0.55);
   border-radius: 999px;
