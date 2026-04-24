@@ -472,6 +472,12 @@ a {
   font-size: 1.15rem;
 }
 
+.glossary-term-material-title {
+  margin: 0;
+  color: #e0f2fe;
+  font-size: 1.02rem;
+}
+
 .glossary-term-description {
   margin: 6px 0 0;
   color: #cbd5e1;
