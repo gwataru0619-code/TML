@@ -15,9 +15,12 @@
     <!-- ブラウザのタブに表示されるページ名 -->
     <title>作品ライブラリ | TYPEMOON資料館</title>
     <!-- 既存の共通デザインCSSを読み込みます -->
-    <link rel="stylesheet" href="style.css?v=20260424-4" />
+    <link rel="stylesheet" href="style.css?v=20260424-5" />
   </head>
   <body>
+    <!-- 画面上端のハンバーガーメニューです（JavaScriptで自動生成されます） -->
+    <div id="site-menu"></div>
+
     <!-- ページ上部の見出しエリア -->
     <header class="site-header">
       <h1>作品ライブラリ</h1>
@@ -93,7 +96,7 @@
       </section>
 
       <!-- トップページへ戻るリンク -->
-      <p><a class="back-link" href="index.html?v=20260424-4">トップへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260424-5">トップへ戻る</a></p>
     </main>
 
     <script>
@@ -246,7 +249,7 @@
       function createCharacterLinkElement(characterName) {
         const link = document.createElement("a");
         link.className = "relation-link";
-        link.href = `characters.html?v=20260424-4&character=${encodeURIComponent(
+        link.href = `characters.html?v=20260424-5&character=${encodeURIComponent(
           characterName
         )}`;
         link.textContent = characterName;
@@ -419,5 +422,7 @@
       resetDetailPanel();
       updateWorksView();
     </script>
+    <!-- 共通ハンバーガーメニューの開閉とリンク描画を担当するJSです -->
+    <script src="menu.js?v=20260424-5"></script>
   </body>
 </html>
