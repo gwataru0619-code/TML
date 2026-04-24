@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- 文字化けを防ぐため、文字コードをUTF-8に指定します -->
+    <meta charset="UTF-8" />
+    <!-- スマホ表示のときに、画面幅に合わせてレイアウトを調整します -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- キャッシュ対策: 更新後に古いHTMLを読み込みにくくします -->
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- ブラウザのタブに表示されるページ名 -->
+    <title>作品ライブラリ | TYPEMOON資料館</title>
+    <!-- 既存の共通デザインCSSを読み込みます -->
+    <link rel="stylesheet" href="style.css?v=20260422-5" />
+  </head>
+  <body>
+    <!-- ページ上部の見出しエリア -->
+    <header class="site-header">
+      <h1>作品ライブラリ</h1>
+      <p>TYPEMOON作品を一覧で確認できます</p>
+    </header>
+
+    <main class="container">
+      <section class="content-card">
+        <!-- JavaScriptで生成した作品カードを、この中に追加していきます -->
+        <div id="works-list" class="works-grid"></div>
+      </section>
+
+      <!-- トップページへ戻るリンク -->
+      <p><a class="back-link" href="index.html?v=20260422-5">トップへ戻る</a></p>
+    </main>
+
+    <script>
+      // ここに作品データを「配列（JSON形式の書き方）」でまとめます。
+      // 後から作品を追加したいときは、下の見本を参考にオブジェクトを1件追加してください。
+      //
+      // ▼ 1件分のデータ見本
+      // {
+      //   title: "作品タイトル",
+      //   releaseDate: "YYYY-MM-DD",
+      //   category: "ゲーム / アニメ / 小説 など",
+      //   summary: "ここにあらすじを書きます。"
+      // }
+      const worksData = [
+        {
+          title: "Fate/stay night",
+          releaseDate: "2004-01-30",
+          category: "PCゲーム",
+          summary:
+            "聖杯戦争に巻き込まれた少年・衛宮士郎が、サーヴァントとともに戦いへ身を投じる物語。"
+        },
+        {
+          title: "月姫 -A piece of blue glass moon-",
+          releaseDate: "2021-08-26",
+          category: "PS4 / Nintendo Switch",
+          summary:
+            "異能の眼を持つ遠野志貴が、吸血鬼事件の渦中で自身の過去と向き合っていく伝奇作品。"
+        },
+        {
+          title: "Fate/Grand Order",
+          releaseDate: "2015-07-30",
+          category: "スマートフォンゲーム",
+          summary:
+            "人理焼却を阻止するため、時代を超えて英霊とともに特異点を巡る長編RPG。"
+        }
+      ];
+
+      // id="works-list" の要素を取得します。
+      const worksListElement = document.getElementById("works-list");
+
+      // データ配列を先頭から順番に処理して、1件ずつHTMLカードを作ります。
+      worksData.forEach((work) => {
+        // articleタグで、作品1件分のまとまりを表します。
+        const card = document.createElement("article");
+        card.className = "work-card";
+
+        // innerHTMLで、カードの中身をまとめて作ります。
+        card.innerHTML = `
+          <h2>${work.title}</h2>
+          <p class="work-meta">発売日: ${work.releaseDate}</p>
+          <p class="work-meta">分類: ${work.category}</p>
+          <p class="work-summary">${work.summary}</p>
+        `;
+
+        // 作ったカードを一覧エリアの最後に追加します。
+        worksListElement.appendChild(card);
+      });
+    </script>
+  </body>
+</html>
