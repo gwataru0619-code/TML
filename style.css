@@ -436,24 +436,6 @@ a {
   color: #bae6fd;
 }
 
-.glossary-category-groups {
-  display: grid;
-  gap: 16px;
-}
-
-.glossary-category-group {
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  border-radius: 12px;
-  padding: 14px 16px;
-  background: rgba(15, 23, 42, 0.55);
-}
-
-.glossary-category-group h2 {
-  margin: 0 0 10px;
-  color: #e0f2fe;
-  font-size: 1.15rem;
-}
-
 .glossary-term-list {
   display: grid;
   gap: 12px;
@@ -491,6 +473,16 @@ a {
   padding: 4px 8px;
   color: #bae6fd;
   font-size: 0.84rem;
+}
+
+.glossary-sub-label {
+  margin: 12px 0 8px;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.glossary-entry-chip-group {
+  margin-top: 8px;
 }
 
 .timeline {
