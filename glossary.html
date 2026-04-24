@@ -12,7 +12,7 @@
     <!-- ブラウザのタブに表示されるページ名です -->
     <title>用語集 | TYPEMOON資料館</title>
     <!-- GitHub Pagesのキャッシュ対策として、末尾にバージョン番号を付けます -->
-    <link rel="stylesheet" href="style.css?v=20260424-8" />
+    <link rel="stylesheet" href="style.css?v=20260424-9" />
   </head>
   <body>
     <!-- このheaderはページ上部のタイトルエリアです -->
@@ -40,11 +40,34 @@
           </button>
         </div>
 
+        <!-- 作品ライブラリと同じ操作感で、検索とカテゴリ絞り込みを用意します -->
+        <div class="works-controls" aria-label="用語集の検索と絞り込み">
+          <div class="works-controls-row">
+            <label class="works-control-label" for="glossary-search-input">
+              検索
+              <input
+                id="glossary-search-input"
+                type="search"
+                placeholder="マテリアル名・単語名・説明文で検索"
+              />
+            </label>
+            <label class="works-control-label" for="glossary-category-select">
+              カテゴリ
+              <select id="glossary-category-select">
+                <option value="all">すべてのカテゴリ</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
         <!-- 一覧と詳細パネルを横並びで表示します（狭い画面では縦並び） -->
         <div class="works-layout">
           <div>
             <!-- JavaScriptで一覧カードを描画する領域です -->
             <div id="glossary-list" class="works-grid"></div>
+            <p id="glossary-empty-message" class="works-empty" hidden>
+              条件に一致する項目はありません。
+            </p>
           </div>
 
           <!-- 右側に表示する詳細パネルです -->
@@ -69,16 +92,19 @@
       </section>
 
       <!-- href="index.html" でトップページへ移動します -->
-      <p><a class="back-link" href="index.html?v=20260424-8">トップへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260424-9">トップへ戻る</a></p>
     </main>
 
     <script>
       // 用語データは「辞書（マテリアル）ごと」に1つの配列で管理します。
-      // entries に、そのマテリアル内の単語と説明を入れます。
+      // publicationDate と summary を追加して、資料情報も管理できるようにします。
       //
       // ▼ 1件分のデータ見本
       // {
       //   material: "辞書名（マテリアル名）",
+      //   publicationDate: "YYYY-MM-DD",
+      //   summary: "マテリアル自体の短い解説",
+      //   categories: ["カテゴリA", "カテゴリB"],
       //   entries: [
       //     { term: "単語名", description: "その辞書での説明文" },
       //     { term: "別の単語", description: "その辞書での説明文" }
@@ -87,6 +113,10 @@
       const glossaryMaterialsData = [
         {
           material: "Fate/stay night マテリアル",
+          publicationDate: "2004-01-30",
+          summary:
+            "『Fate/stay night』本編の世界観を補強する基礎資料。魔術理論や聖杯戦争の前提知識を中心に収録。",
+          categories: ["Fate", "ゲーム", "設定資料"],
           entries: [
             {
               term: "魔術",
@@ -112,6 +142,10 @@
         },
         {
           material: "Fate/Zero 用語辞典",
+          publicationDate: "2011-01-11",
+          summary:
+            "第四次聖杯戦争の背景を理解するための用語辞典。陣営関係と儀式運用の説明が厚め。",
+          categories: ["Fate", "小説", "アニメ", "設定資料"],
           entries: [
             {
               term: "魔術",
@@ -132,6 +166,10 @@
         },
         {
           material: "Fate/Grand Order マテリアル",
+          publicationDate: "2015-07-30",
+          summary:
+            "FGOにおける世界観設定を整理したマテリアル。英霊召喚と特異点修復の文脈が中心。",
+          categories: ["Fate", "ゲーム", "モバイル", "設定資料"],
           entries: [
             {
               term: "英霊",
@@ -152,6 +190,10 @@
         },
         {
           material: "空の境界 公式パンフレット用語",
+          publicationDate: "2007-12-01",
+          summary:
+            "『空の境界』劇場版パンフレット由来の用語群。作品内の思想や能力概念を補足する。",
+          categories: ["空の境界", "劇場版", "設定資料"],
           entries: [
             {
               term: "根源",
@@ -172,6 +214,10 @@
         },
         {
           material: "月姫読本 Plus Period",
+          publicationDate: "2004-10-22",
+          summary:
+            "『月姫』関連設定をまとめた読本。吸血種・魔眼・世界観の成り立ちを横断的に解説。",
+          categories: ["月姫", "ゲーム", "設定資料"],
           entries: [
             {
               term: "直死の魔眼",
@@ -195,16 +241,33 @@
       // モード状態（by-material / by-term）を保持します。
       let currentMode = "by-material";
       let selectedItemName = null;
+      let currentSearchKeyword = "";
+      let currentCategoryFilter = "all";
 
       const glossaryListElement = document.getElementById("glossary-list");
+      const glossaryEmptyMessageElement = document.getElementById("glossary-empty-message");
       const glossaryDetailPanelElement = document.getElementById("glossary-detail-panel");
       const glossaryDetailTitleElement = document.getElementById("glossary-detail-title");
       const glossaryDetailMetaElement = document.getElementById("glossary-detail-meta");
       const glossaryDetailContentElement = document.getElementById("glossary-detail-content");
+      const glossarySearchInputElement = document.getElementById("glossary-search-input");
+      const glossaryCategorySelectElement = document.getElementById("glossary-category-select");
       const glossaryClosePanelButtonElement = document.getElementById(
         "glossary-close-panel-button"
       );
       const modeButtonElements = document.querySelectorAll("[data-mode-button]");
+
+      // カテゴリ配列を重複なしで作り、絞り込みselectに反映します。
+      function setupCategoryOptions() {
+        const categories = [...new Set(glossaryMaterialsData.flatMap((item) => item.categories))]
+          .sort((a, b) => a.localeCompare(b, "ja"));
+        categories.forEach((category) => {
+          const option = document.createElement("option");
+          option.value = category;
+          option.textContent = category;
+          glossaryCategorySelectElement.appendChild(option);
+        });
+      }
 
       // 単語別表示のために「単語 -> 複数辞書での説明」へ変換します。
       function buildTermMap(materialData) {
@@ -216,11 +279,96 @@
             }
             map.get(entry.term).push({
               material: materialItem.material,
+              publicationDate: materialItem.publicationDate,
+              summary: materialItem.summary,
+              categories: materialItem.categories,
               description: entry.description
             });
           });
         });
         return map;
+      }
+
+      // 日付文字列をそのまま表示し、空なら「不明」を返します。
+      function displayDate(dateValue) {
+        return dateValue || "不明";
+      }
+
+      function createCategoryChips(categories) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "relation-links";
+        categories.forEach((category) => {
+          const chip = document.createElement("span");
+          chip.className = "glossary-category-chip";
+          chip.textContent = category;
+          wrapper.appendChild(chip);
+        });
+        return wrapper;
+      }
+
+      // カテゴリ絞り込みの条件に一致するかを判定します。
+      function isCategoryMatched(materialItem) {
+        return (
+          currentCategoryFilter === "all" || materialItem.categories.includes(currentCategoryFilter)
+        );
+      }
+
+      // マテリアル別表示用の検索判定です。
+      function isMaterialSearchMatched(materialItem) {
+        if (!currentSearchKeyword) {
+          return true;
+        }
+        const searchableText = [
+          materialItem.material,
+          materialItem.publicationDate,
+          materialItem.summary,
+          materialItem.categories.join(" "),
+          materialItem.entries.map((entry) => `${entry.term} ${entry.description}`).join(" ")
+        ]
+          .join(" ")
+          .toLowerCase();
+        return searchableText.includes(currentSearchKeyword);
+      }
+
+      function getFilteredMaterialsForMaterialMode() {
+        return [...glossaryMaterialsData]
+          .filter((item) => isCategoryMatched(item) && isMaterialSearchMatched(item))
+          .sort((a, b) => {
+            const dateCompare = a.publicationDate.localeCompare(b.publicationDate);
+            if (dateCompare !== 0) {
+              return dateCompare;
+            }
+            return a.material.localeCompare(b.material, "ja");
+          });
+      }
+
+      function getFilteredTermsForTermMode() {
+        const categoryFilteredMaterials = glossaryMaterialsData.filter((item) => isCategoryMatched(item));
+        const termMap = buildTermMap(categoryFilteredMaterials);
+
+        return [...termMap.entries()]
+          .map(([termName, descriptions]) => ({ termName, descriptions }))
+          .filter((termItem) => {
+            if (!currentSearchKeyword) {
+              return true;
+            }
+            const searchableText = [
+              termItem.termName,
+              ...termItem.descriptions.map((descriptionItem) =>
+                [
+                  descriptionItem.material,
+                  descriptionItem.publicationDate,
+                  descriptionItem.summary,
+                  descriptionItem.categories.join(" "),
+                  descriptionItem.description
+                ].join(" ")
+              )
+            ]
+              .join(" ")
+              .toLowerCase();
+            return searchableText.includes(currentSearchKeyword);
+          })
+          .sort((a, b) => a.termName.localeCompare(b.termName, "ja"));
       }
 
       // 詳細パネルを初期状態に戻します。
@@ -236,8 +384,21 @@
       // マテリアルを選択したときの詳細表示です。
       function showMaterialDetailPanel(materialItem) {
         glossaryDetailTitleElement.textContent = materialItem.material;
-        glossaryDetailMetaElement.textContent = `収録単語数: ${materialItem.entries.length}件`;
+        glossaryDetailMetaElement.textContent = `出版日: ${displayDate(
+          materialItem.publicationDate
+        )} / 収録単語数: ${materialItem.entries.length}件`;
         glossaryDetailContentElement.innerHTML = "";
+
+        const summary = document.createElement("p");
+        summary.className = "work-detail-description";
+        summary.textContent = materialItem.summary;
+        glossaryDetailContentElement.appendChild(summary);
+
+        const categoryTitle = document.createElement("p");
+        categoryTitle.className = "relation-label";
+        categoryTitle.textContent = "カテゴリ";
+        glossaryDetailContentElement.appendChild(categoryTitle);
+        glossaryDetailContentElement.appendChild(createCategoryChips(materialItem.categories));
 
         const list = document.createElement("dl");
         list.className = "glossary-list";
@@ -269,7 +430,7 @@
         glossaryDetailContentElement.innerHTML = "";
 
         const sortedDescriptions = [...termDescriptions].sort((a, b) =>
-          a.material.localeCompare(b.material, "ja")
+          a.publicationDate.localeCompare(b.publicationDate)
         );
 
         sortedDescriptions.forEach((item) => {
@@ -278,8 +439,16 @@
 
           const title = document.createElement("h3");
           title.className = "glossary-term-material-title";
-          title.textContent = `${item.material} では`;
+          title.textContent = `${item.material}（出版日: ${displayDate(item.publicationDate)}）`;
           card.appendChild(title);
+
+          const materialSummary = document.createElement("p");
+          materialSummary.className = "work-summary";
+          materialSummary.textContent = item.summary;
+          card.appendChild(materialSummary);
+
+          const categories = createCategoryChips(item.categories);
+          card.appendChild(categories);
 
           const description = document.createElement("p");
           description.className = "glossary-term-description";
@@ -296,13 +465,12 @@
       // 現在モードの一覧を描画します（左側）。
       function renderGlossaryList() {
         glossaryListElement.innerHTML = "";
+        glossaryEmptyMessageElement.hidden = true;
 
         if (currentMode === "by-material") {
-          const sortedMaterials = [...glossaryMaterialsData].sort((a, b) =>
-            a.material.localeCompare(b.material, "ja")
-          );
+          const filteredMaterials = getFilteredMaterialsForMaterialMode();
 
-          sortedMaterials.forEach((materialItem) => {
+          filteredMaterials.forEach((materialItem) => {
             const card = document.createElement("article");
             card.className = "work-card";
             if (selectedItemName === materialItem.material) {
@@ -322,24 +490,27 @@
 
             const meta = document.createElement("p");
             meta.className = "work-meta";
-            meta.textContent = `登録単語数: ${materialItem.entries.length}件`;
+            meta.textContent = `出版日: ${displayDate(
+              materialItem.publicationDate
+            )} / 収録単語数: ${materialItem.entries.length}件`;
             card.appendChild(meta);
 
             const preview = document.createElement("p");
             preview.className = "work-summary";
-            const previewTerms = materialItem.entries
-              .map((entry) => entry.term)
-              .sort((a, b) => a.localeCompare(b, "ja"))
-              .slice(0, 4)
-              .join(" / ");
-            preview.textContent = `収録例: ${previewTerms}`;
+            preview.textContent = materialItem.summary;
             card.appendChild(preview);
+
+            card.appendChild(createCategoryChips(materialItem.categories));
 
             glossaryListElement.appendChild(card);
           });
 
+          if (filteredMaterials.length === 0) {
+            glossaryEmptyMessageElement.hidden = false;
+          }
+
           if (selectedItemName) {
-            const selectedMaterial = glossaryMaterialsData.find(
+            const selectedMaterial = filteredMaterials.find(
               (materialItem) => materialItem.material === selectedItemName
             );
             if (selectedMaterial) {
@@ -354,11 +525,9 @@
           return;
         }
 
-        const termMap = buildTermMap(glossaryMaterialsData);
-        const sortedTermNames = [...termMap.keys()].sort((a, b) => a.localeCompare(b, "ja"));
-
-        sortedTermNames.forEach((termName) => {
-          const descriptions = termMap.get(termName);
+        const filteredTerms = getFilteredTermsForTermMode();
+        filteredTerms.forEach((termItem) => {
+          const { termName, descriptions } = termItem;
           const card = document.createElement("article");
           card.className = "work-card";
           if (selectedItemName === termName) {
@@ -383,19 +552,25 @@
 
           const preview = document.createElement("p");
           preview.className = "work-summary";
-          preview.textContent = `掲載辞書: ${descriptions
-            .map((item) => item.material)
-            .sort((a, b) => a.localeCompare(b, "ja"))
-            .join(" / ")}`;
+          preview.textContent = `掲載辞書: ${descriptions.map((item) => item.material).join(" / ")}`;
           card.appendChild(preview);
+
+          const termCategories = [...new Set(descriptions.flatMap((item) => item.categories))].sort(
+            (a, b) => a.localeCompare(b, "ja")
+          );
+          card.appendChild(createCategoryChips(termCategories));
 
           glossaryListElement.appendChild(card);
         });
 
+        if (filteredTerms.length === 0) {
+          glossaryEmptyMessageElement.hidden = false;
+        }
+
         if (selectedItemName) {
-          const selectedTermDescriptions = termMap.get(selectedItemName);
-          if (selectedTermDescriptions) {
-            showTermDetailPanel(selectedItemName, selectedTermDescriptions);
+          const selectedTermItem = filteredTerms.find((termItem) => termItem.termName === selectedItemName);
+          if (selectedTermItem) {
+            showTermDetailPanel(selectedItemName, selectedTermItem.descriptions);
           } else {
             selectedItemName = null;
             resetDetailPanel();
@@ -422,6 +597,18 @@
         });
       });
 
+      glossarySearchInputElement.addEventListener("input", () => {
+        currentSearchKeyword = glossarySearchInputElement.value.trim().toLowerCase();
+        selectedItemName = null;
+        renderGlossaryList();
+      });
+
+      glossaryCategorySelectElement.addEventListener("change", () => {
+        currentCategoryFilter = glossaryCategorySelectElement.value;
+        selectedItemName = null;
+        renderGlossaryList();
+      });
+
       // 詳細パネルの「閉じる」ボタンです。
       glossaryClosePanelButtonElement.addEventListener("click", () => {
         selectedItemName = null;
@@ -429,11 +616,12 @@
         renderGlossaryList();
       });
 
+      setupCategoryOptions();
       updateModeButtons();
       resetDetailPanel();
       renderGlossaryList();
     </script>
     <!-- 共通ハンバーガーメニューを生成するJavaScriptを読み込みます -->
-    <script src="menu.js?v=20260424-8"></script>
+    <script src="menu.js?v=20260424-9"></script>
   </body>
 </html>
