@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <!-- 文字化けを防ぐため、文字コードをUTF-8に指定します -->
+    <meta charset="UTF-8" />
+    <!-- スマホ表示のときに、画面幅に合わせてレイアウトを調整します -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- キャッシュ対策: 更新後に古いHTMLを読み込みにくくします -->
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- ブラウザのタブに表示されるページ名 -->
+    <title>キャラクター一覧 | TYPEMOON資料館</title>
+    <!-- 共通デザインCSSを読み込みます -->
+    <link rel="stylesheet" href="style.css?v=20260424-3" />
+  </head>
+  <body>
+    <!-- ページ上部の見出しエリア -->
+    <header class="site-header">
+      <h1>キャラクター一覧</h1>
+      <p>登場キャラクターを一覧で確認できます</p>
+    </header>
+
+    <main class="container">
+      <section class="content-card">
+        <!-- ここは検索と絞り込みの操作エリアです -->
+        <div class="works-controls" aria-label="キャラクターの検索と絞り込み">
+          <div class="works-controls-row">
+            <label class="works-control-label" for="character-search-input">
+              検索
+              <input
+                id="character-search-input"
+                type="search"
+                placeholder="名前・説明で検索"
+              />
+            </label>
+
+            <label class="works-control-label" for="character-role-select">
+              役割カテゴリ
+              <select id="character-role-select">
+                <option value="all">すべて</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <!-- 左: リスト / 右: 詳細サイドパネル の2カラムレイアウトです -->
+        <div class="works-layout">
+          <div>
+            <!-- JavaScriptで生成したキャラクターカードを、この中に追加していきます -->
+            <div id="characters-list" class="works-grid"></div>
+            <!-- 結果が0件のときに表示するメッセージです -->
+            <p id="characters-empty-message" class="works-empty" hidden>
+              条件に一致するキャラクターはありません。
+            </p>
+          </div>
+
+          <!-- 名前を押したときの詳細を表示するサイドパネルです -->
+          <aside
+            id="character-detail-panel"
+            class="work-detail-panel is-empty"
+            aria-live="polite"
+          >
+            <div class="work-detail-header">
+              <h2 id="character-detail-name">キャラクターを選択してください</h2>
+              <!-- このボタンを押すと、詳細表示を閉じて初期状態に戻します -->
+              <button
+                id="character-close-panel-button"
+                class="close-panel-button"
+                type="button"
+                disabled
+              >
+                閉じる
+              </button>
+            </div>
+            <p id="character-detail-first-appearance" class="work-meta">
+              初登場日: -
+            </p>
+            <p id="character-detail-role" class="work-meta">役割: -</p>
+            <p id="character-detail-summary" class="work-summary">
+              左側の名前を押すと、ここに詳細情報が表示されます。
+            </p>
+            <p id="character-detail-description" class="work-detail-description" hidden></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- トップページへ戻るリンク -->
+      <p><a class="back-link" href="index.html?v=20260424-3">トップへ戻る</a></p>
+    </main>
+
+    <script>
+      // ここにキャラクターデータを「配列（JSON形式の書き方）」でまとめます。
+      // 後から追加したいときは、下の見本を参考にオブジェクトを1件追加してください。
+      //
+      // ▼ 1件分のデータ見本
+      // {
+      //   name: "キャラクター名",
+      //   firstAppearance: "YYYY-MM-DD",
+      //   role: "主人公 / サーヴァント / 魔術師 など",
+      //   summary: "一覧カードに表示する短い説明です。",
+      //   description: "詳細パネルに表示する説明文です。（省略可）"
+      // }
+      const charactersData = [
+        {
+          name: "衛宮士郎",
+          firstAppearance: "2004-01-30",
+          role: "主人公",
+          summary:
+            "『Fate/stay night』の主人公。正義の味方を目指し、聖杯戦争に参加する。",
+          description:
+            "幼い頃の大火災をきっかけに、誰かを救う生き方を選んだ少年。複数ルートで異なる成長を見せる。"
+        },
+        {
+          name: "セイバー",
+          firstAppearance: "2004-01-30",
+          role: "サーヴァント",
+          summary:
+            "士郎と契約する剣士のサーヴァント。高い戦闘能力と誇り高い精神を持つ。",
+          description:
+            "騎士王としての責務と個人の願いの間で葛藤する。Fateシリーズを象徴する人気キャラクター。"
+        },
+        {
+          name: "遠坂凛",
+          firstAppearance: "2004-01-30",
+          role: "魔術師",
+          summary:
+            "遠坂家の後継者として聖杯戦争に挑む優秀な魔術師。",
+          description:
+            "冷静な判断力と行動力を持ち、時に厳しく時に面倒見のよい性格で物語を引っ張る。"
+        },
+        {
+          name: "両儀式",
+          firstAppearance: "2004-06-01",
+          role: "主人公",
+          summary:
+            "『空の境界』の主人公。直死の魔眼を持ち、怪異事件に立ち向かう。",
+          description:
+            "静かな佇まいの中に強い意志を持つ人物。死の概念を視る力で常識外れの戦いを可能にする。"
+        },
+        {
+          name: "アルクェイド・ブリュンスタッド",
+          firstAppearance: "2000-12-29",
+          role: "吸血鬼",
+          summary:
+            "『月姫』のメインヒロイン。真祖として圧倒的な力を持つ吸血鬼。",
+          description:
+            "無邪気さと強大な存在感を併せ持ち、主人公・遠野志貴の運命を大きく変える存在。"
+        }
+      ];
+
+      // id="characters-list" の要素を取得します。
+      const charactersListElement = document.getElementById("characters-list");
+      // 検索ボックスの要素を取得します。
+      const characterSearchInputElement = document.getElementById(
+        "character-search-input"
+      );
+      // 役割カテゴリ選択の要素を取得します。
+      const characterRoleSelectElement = document.getElementById(
+        "character-role-select"
+      );
+      // 結果0件メッセージの要素を取得します。
+      const charactersEmptyMessageElement = document.getElementById(
+        "characters-empty-message"
+      );
+
+      // 詳細サイドパネル関連の要素を取得します。
+      const characterDetailPanelElement = document.getElementById(
+        "character-detail-panel"
+      );
+      const characterDetailNameElement = document.getElementById(
+        "character-detail-name"
+      );
+      const characterDetailFirstAppearanceElement = document.getElementById(
+        "character-detail-first-appearance"
+      );
+      const characterDetailRoleElement = document.getElementById(
+        "character-detail-role"
+      );
+      const characterDetailSummaryElement = document.getElementById(
+        "character-detail-summary"
+      );
+      const characterDetailDescriptionElement = document.getElementById(
+        "character-detail-description"
+      );
+      const characterClosePanelButtonElement = document.getElementById(
+        "character-close-panel-button"
+      );
+
+      // いま詳細表示中のキャラクター名を保持します。
+      let selectedCharacterName = null;
+      // 現在画面に表示している一覧データを保持します（選択状態の再描画に使います）。
+      let currentDisplayedCharacters = [];
+
+      // 役割カテゴリの候補を、配列データから重複なしで取り出して作ります。
+      const roles = [...new Set(charactersData.map((character) => character.role))];
+
+      // role-select にカテゴリ選択肢を追加します。
+      roles.forEach((role) => {
+        const option = document.createElement("option");
+        option.value = role;
+        option.textContent = role;
+        characterRoleSelectElement.appendChild(option);
+      });
+
+      // 詳細パネルを初期状態（未選択）に戻す関数です。
+      function resetCharacterDetailPanel() {
+        characterDetailPanelElement.classList.add("is-empty");
+        characterDetailNameElement.textContent = "キャラクターを選択してください";
+        characterDetailFirstAppearanceElement.textContent = "初登場日: -";
+        characterDetailRoleElement.textContent = "役割: -";
+        characterDetailSummaryElement.textContent =
+          "左側の名前を押すと、ここに詳細情報が表示されます。";
+        characterDetailDescriptionElement.textContent = "";
+        characterDetailDescriptionElement.hidden = true;
+        characterClosePanelButtonElement.disabled = true;
+      }
+
+      // キャラクターデータを受け取り、詳細サイドパネルに表示する関数です。
+      function showCharacterDetailPanel(character) {
+        characterDetailPanelElement.classList.remove("is-empty");
+        characterDetailNameElement.textContent = character.name;
+        characterDetailFirstAppearanceElement.textContent = `初登場日: ${character.firstAppearance}`;
+        characterDetailRoleElement.textContent = `役割: ${character.role}`;
+        characterDetailSummaryElement.textContent = character.summary;
+        characterDetailDescriptionElement.textContent = character.description || "";
+        characterDetailDescriptionElement.hidden = !character.description;
+        characterClosePanelButtonElement.disabled = false;
+      }
+
+      // 受け取ったキャラクターデータ配列を画面に描画する関数です。
+      function renderCharacters(characters) {
+        // いったん表示を空にしてから、最新の結果だけ表示します。
+        charactersListElement.innerHTML = "";
+        currentDisplayedCharacters = characters;
+
+        characters.forEach((character) => {
+          // articleタグで、キャラクター1件分のまとまりを表します。
+          const card = document.createElement("article");
+          card.className = "work-card";
+          if (character.name === selectedCharacterName) {
+            card.classList.add("is-selected");
+          }
+
+          // 名前はボタンにして、押すと右側パネルに詳細を表示できるようにします。
+          const nameButton = document.createElement("button");
+          nameButton.type = "button";
+          nameButton.className = "work-title-button";
+          nameButton.textContent = character.name;
+          nameButton.addEventListener("click", () => {
+            selectedCharacterName = character.name;
+            showCharacterDetailPanel(character);
+            // 選択中のカードを見た目で分かるように再描画します。
+            renderCharacters(currentDisplayedCharacters);
+          });
+
+          const firstAppearanceElement = document.createElement("p");
+          firstAppearanceElement.className = "work-meta";
+          firstAppearanceElement.textContent = `初登場日: ${character.firstAppearance}`;
+
+          const roleElement = document.createElement("p");
+          roleElement.className = "work-meta";
+          roleElement.textContent = `役割: ${character.role}`;
+
+          const summaryElement = document.createElement("p");
+          summaryElement.className = "work-summary";
+          summaryElement.textContent = character.summary;
+
+          card.appendChild(nameButton);
+          card.appendChild(firstAppearanceElement);
+          card.appendChild(roleElement);
+          card.appendChild(summaryElement);
+
+          // 作ったカードを一覧エリアの最後に追加します。
+          charactersListElement.appendChild(card);
+        });
+
+        // 結果が0件ならメッセージを表示し、1件以上なら隠します。
+        charactersEmptyMessageElement.hidden = characters.length !== 0;
+      }
+
+      // 検索・絞り込み条件を使って、表示するキャラクターを作る関数です。
+      function updateCharactersView() {
+        const searchKeyword = characterSearchInputElement.value
+          .trim()
+          .toLowerCase();
+        const selectedRole = characterRoleSelectElement.value;
+
+        // 1) 役割カテゴリで絞り込み
+        // 2) 名前と説明で検索
+        // 3) 初登場日の古い順（年代順）にソート
+        const filteredAndSortedCharacters = charactersData
+          .filter((character) => {
+            const isRoleMatched =
+              selectedRole === "all" || character.role === selectedRole;
+            const isSearchMatched =
+              character.name.toLowerCase().includes(searchKeyword) ||
+              character.summary.toLowerCase().includes(searchKeyword) ||
+              (character.description || "").toLowerCase().includes(searchKeyword);
+            return isRoleMatched && isSearchMatched;
+          })
+          .sort(
+            (a, b) =>
+              new Date(a.firstAppearance) - new Date(b.firstAppearance)
+          );
+
+        // 絞り込み後の一覧に選択中のキャラクターが存在しない場合、詳細表示を閉じます。
+        const selectedCharacter = filteredAndSortedCharacters.find(
+          (character) => character.name === selectedCharacterName
+        );
+        if (!selectedCharacter) {
+          selectedCharacterName = null;
+          resetCharacterDetailPanel();
+        } else {
+          showCharacterDetailPanel(selectedCharacter);
+        }
+
+        renderCharacters(filteredAndSortedCharacters);
+      }
+
+      // 入力が変わるたびに再描画します。
+      characterSearchInputElement.addEventListener("input", updateCharactersView);
+      characterRoleSelectElement.addEventListener("change", updateCharactersView);
+      characterClosePanelButtonElement.addEventListener("click", () => {
+        selectedCharacterName = null;
+        resetCharacterDetailPanel();
+        renderCharacters(currentDisplayedCharacters);
+      });
+
+      // 初期表示時も、同じ処理で表示します。
+      resetCharacterDetailPanel();
+      updateCharactersView();
+    </script>
+  </body>
+</html>
