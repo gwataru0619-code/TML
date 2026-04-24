@@ -12,7 +12,7 @@
     <!-- ブラウザのタブに表示されるページ名です -->
     <title>用語集 | TYPEMOON資料館</title>
     <!-- GitHub Pagesのキャッシュ対策として、末尾にバージョン番号を付けます -->
-    <link rel="stylesheet" href="style.css?v=20260424-5" />
+    <link rel="stylesheet" href="style.css?v=20260424-7" />
   </head>
   <body>
     <!-- このheaderはページ上部のタイトルエリアです -->
@@ -25,34 +25,204 @@
 
     <!-- mainはこのページの中心となるコンテンツ領域です -->
     <main class="container">
-      <!-- 用語の一覧を表示するカード領域です -->
       <section class="content-card">
-        <!-- dlは「用語（dt）」と「説明（dd）」のセットを表すタグです -->
-        <dl class="glossary-list">
-          <div>
-            <!-- dtは用語名です -->
-            <dt>魔術</dt>
-            <!-- ddは用語の説明文です -->
-            <dd>神秘を再現するための技法。魔術師が系統や刻印を通じて扱う。</dd>
-          </div>
-          <div>
-            <dt>聖杯戦争</dt>
-            <dd>願望機・聖杯を巡ってマスターとサーヴァントが争う儀式。</dd>
-          </div>
-          <div>
-            <dt>根源</dt>
-            <dd>世界の始まりに連なる究極地点。多くの魔術師が到達を目指す。</dd>
-          </div>
-          <div>
-            <dt>英霊</dt>
-            <dd>歴史や伝承に名を残し、座に記録された英雄の霊。</dd>
-          </div>
-        </dl>
+        <!-- 表示モード切り替えボタンです -->
+        <div class="glossary-mode-switch" role="group" aria-label="表示モード切り替え">
+          <button
+            type="button"
+            class="glossary-mode-button is-active"
+            data-mode-button="by-category"
+          >
+            作品別に表示
+          </button>
+          <button type="button" class="glossary-mode-button" data-mode-button="by-term">
+            単語別に表示
+          </button>
+        </div>
+
+        <!-- JavaScriptで表示結果を描画する領域です -->
+        <div id="glossary-view"></div>
       </section>
+
       <!-- href="index.html" でトップページへ移動します -->
-      <p><a class="back-link" href="index.html?v=20260424-5">トップへ戻る</a></p>
+      <p><a class="back-link" href="index.html?v=20260424-7">トップへ戻る</a></p>
     </main>
+
+    <script>
+      // 用語データを1つの配列で管理します。
+      // categories には、その単語が属するカテゴリ（作品名など）を配列で入れます。
+      //
+      // ▼ 1件分のデータ見本
+      // {
+      //   term: "単語名",
+      //   description: "単語の説明文",
+      //   categories: ["カテゴリA", "カテゴリB"]
+      // }
+      const glossaryData = [
+        {
+          term: "魔術",
+          description:
+            "神秘を再現するための技法。魔術師が系統や刻印を通じて扱う。",
+          categories: ["Fate/stay night", "Fate/Zero", "Fate/Grand Order"]
+        },
+        {
+          term: "聖杯戦争",
+          description:
+            "願望機・聖杯を巡ってマスターとサーヴァントが争う儀式。",
+          categories: ["Fate/stay night", "Fate/Zero"]
+        },
+        {
+          term: "英霊",
+          description:
+            "歴史や伝承に名を残し、座に記録された英雄の霊。サーヴァントとして召喚される。",
+          categories: ["Fate/stay night", "Fate/Grand Order"]
+        },
+        {
+          term: "根源",
+          description:
+            "世界の始まりに連なる究極地点。多くの魔術師が到達を目指す。",
+          categories: ["Fate/stay night", "空の境界", "月姫"]
+        },
+        {
+          term: "直死の魔眼",
+          description:
+            "対象の死の線や点を視認し、それをなぞることで切断・殺害できる能力。",
+          categories: ["空の境界", "月姫"]
+        }
+      ];
+
+      // モード状態（by-category / by-term）を保持します。
+      let currentMode = "by-category";
+
+      const glossaryViewElement = document.getElementById("glossary-view");
+      const modeButtonElements = document.querySelectorAll("[data-mode-button]");
+
+      // 作品別表示用に、カテゴリごとの辞書を作る関数です。
+      function buildCategoryMap(data) {
+        const map = new Map();
+        data.forEach((item) => {
+          item.categories.forEach((category) => {
+            if (!map.has(category)) {
+              map.set(category, []);
+            }
+            map.get(category).push(item);
+          });
+        });
+        return map;
+      }
+
+      // 作品別（カテゴリ別）表示を描画します。
+      function renderByCategoryMode(data) {
+        const categoryMap = buildCategoryMap(data);
+        const sortedCategoryNames = [...categoryMap.keys()].sort((a, b) =>
+          a.localeCompare(b, "ja")
+        );
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "glossary-category-groups";
+
+        sortedCategoryNames.forEach((categoryName) => {
+          const section = document.createElement("section");
+          section.className = "glossary-category-group";
+
+          const title = document.createElement("h2");
+          title.textContent = categoryName;
+          section.appendChild(title);
+
+          const list = document.createElement("dl");
+          list.className = "glossary-list";
+
+          const sortedTerms = [...categoryMap.get(categoryName)].sort((a, b) =>
+            a.term.localeCompare(b.term, "ja")
+          );
+
+          sortedTerms.forEach((item) => {
+            const block = document.createElement("div");
+            const term = document.createElement("dt");
+            term.textContent = item.term;
+            const description = document.createElement("dd");
+            description.textContent = item.description;
+            block.appendChild(term);
+            block.appendChild(description);
+            list.appendChild(block);
+          });
+
+          section.appendChild(list);
+          wrapper.appendChild(section);
+        });
+
+        return wrapper;
+      }
+
+      // 単語別表示を描画します。
+      function renderByTermMode(data) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "glossary-term-list";
+
+        const sortedTerms = [...data].sort((a, b) =>
+          a.term.localeCompare(b.term, "ja")
+        );
+
+        sortedTerms.forEach((item) => {
+          const card = document.createElement("article");
+          card.className = "glossary-term-card";
+
+          const term = document.createElement("h2");
+          term.textContent = item.term;
+          card.appendChild(term);
+
+          const description = document.createElement("p");
+          description.className = "glossary-term-description";
+          description.textContent = item.description;
+          card.appendChild(description);
+
+          // 所属カテゴリを小さいラベルで表示します。
+          const labels = document.createElement("div");
+          labels.className = "glossary-category-labels";
+          item.categories.forEach((category) => {
+            const label = document.createElement("span");
+            label.className = "glossary-category-label";
+            label.textContent = category;
+            labels.appendChild(label);
+          });
+          card.appendChild(labels);
+
+          wrapper.appendChild(card);
+        });
+
+        return wrapper;
+      }
+
+      // 現在モードに応じて表示を再描画します。
+      function renderGlossary() {
+        glossaryViewElement.innerHTML = "";
+        if (currentMode === "by-category") {
+          glossaryViewElement.appendChild(renderByCategoryMode(glossaryData));
+        } else {
+          glossaryViewElement.appendChild(renderByTermMode(glossaryData));
+        }
+      }
+
+      // ボタンの見た目（選択中状態）を更新します。
+      function updateModeButtons() {
+        modeButtonElements.forEach((button) => {
+          const isActive = button.dataset.modeButton === currentMode;
+          button.classList.toggle("is-active", isActive);
+        });
+      }
+
+      modeButtonElements.forEach((button) => {
+        button.addEventListener("click", () => {
+          currentMode = button.dataset.modeButton;
+          updateModeButtons();
+          renderGlossary();
+        });
+      });
+
+      updateModeButtons();
+      renderGlossary();
+    </script>
     <!-- 共通ハンバーガーメニューを生成するJavaScriptを読み込みます -->
-    <script src="menu.js?v=20260424-5"></script>
+    <script src="menu.js?v=20260424-7"></script>
   </body>
 </html>
