@@ -237,7 +237,9 @@
 
 
       // カテゴリの候補を、配列データから重複なしで取り出して作ります。
-      const categories = [...new Set(worksData.flatMap((work) => getWorkCategories(work)))];
+      const categories = [
+        ...new Set(worksData.flatMap((work) => getWorkCategories(work)))
+      ];
 
       // category-select にカテゴリ選択肢を追加します。
       categories.forEach((category) => {
@@ -387,7 +389,8 @@
           .filter((work) => {
             const workCategories = getWorkCategories(work);
             const isCategoryMatched =
-              selectedCategory === "all" || workCategories.includes(selectedCategory);
+              selectedCategory === "all" ||
+              workCategories.includes(selectedCategory);
             const searchableText = [
               work.title,
               work.releaseDate,
