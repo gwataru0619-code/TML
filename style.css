@@ -149,6 +149,11 @@ a {
   width: min(1600px, 98%);
 }
 
+.works-page-container {
+  /* 作品ページだけ、広い画面では一覧と詳細欄をゆったり表示します */
+  width: min(1440px, 96%);
+}
+
 .menu-grid {
   display: grid;
   gap: 20px;
@@ -331,6 +336,24 @@ a {
 @media (min-width: 980px) {
   .works-layout {
     grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .works-page-container .works-layout {
+    /* 作品ページでは右側の詳細欄を少し広めにして、長文を読みやすくします */
+    grid-template-columns: minmax(0, 1.6fr) minmax(420px, 0.9fr);
+  }
+}
+
+@media (min-width: 1600px) {
+  .works-page-container {
+    /* 大きな液晶では、作品ページの横幅をさらに活用します */
+    width: min(1680px, 96%);
+  }
+
+  .works-page-container .works-layout {
+    grid-template-columns: minmax(0, 1.5fr) minmax(520px, 0.9fr);
   }
 }
 
