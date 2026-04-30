@@ -37,7 +37,7 @@
               <input
                 id="character-search-input"
                 type="search"
-                placeholder="名前・説明で検索"
+                placeholder="名前・役割・説明で検索"
               />
             </label>
 
@@ -108,7 +108,7 @@
       // {
       //   name: "キャラクター名",
       //   firstAppearance: "YYYY-MM-DD",
-      //   role: "主人公 / サーヴァント / 魔術師 など",
+      //   roles: ["主人公", "サーヴァント", "魔術師 など"],
       //   summary: "一覧カードに表示する短い説明です。",
       //   description: "詳細パネルに表示する説明文です。（省略可）",
       //   works: ["登場作品1", "登場作品2"]
@@ -117,7 +117,7 @@
         {
           name: "衛宮士郎",
           firstAppearance: "2004-01-30",
-          role: "主人公",
+          roles: ["主人公", "魔術師"],
           summary:
             "『Fate/stay night』の主人公。正義の味方を目指し、聖杯戦争に参加する。",
           description:
@@ -127,7 +127,7 @@
         {
           name: "セイバー",
           firstAppearance: "2004-01-30",
-          role: "サーヴァント",
+          roles: ["サーヴァント", "剣士"],
           summary:
             "士郎と契約する剣士のサーヴァント。高い戦闘能力と誇り高い精神を持つ。",
           description:
@@ -137,7 +137,7 @@
         {
           name: "遠坂凛",
           firstAppearance: "2004-01-30",
-          role: "魔術師",
+          roles: ["魔術師", "マスター"],
           summary:
             "遠坂家の後継者として聖杯戦争に挑む優秀な魔術師。",
           description:
@@ -147,7 +147,7 @@
         {
           name: "両儀式",
           firstAppearance: "2004-06-01",
-          role: "主人公",
+          roles: ["主人公", "魔眼保持者"],
           summary:
             "『空の境界』の主人公。直死の魔眼を持ち、怪異事件に立ち向かう。",
           description:
@@ -157,7 +157,7 @@
         {
           name: "アルクェイド・ブリュンスタッド",
           firstAppearance: "2000-12-29",
-          role: "吸血鬼",
+          roles: ["吸血鬼", "ヒロイン"],
           summary:
             "『月姫』のメインヒロイン。真祖として圧倒的な力を持つ吸血鬼。",
           description:
@@ -220,8 +220,28 @@
       // URLの初期指定は1回だけ使いたいので、可変の変数に入れます。
       let pendingInitialCharacterName = initialQueryCharacterName;
 
+      // キャラクターの役割は複数入力できるため、常に配列として扱います。
+      function getCharacterRoles(character) {
+        if (Array.isArray(character.roles)) {
+          return character.roles;
+        }
+        if (character.role) {
+          return [character.role];
+        }
+        return [];
+      }
+
+      function formatCharacterRoles(character) {
+        const roles = getCharacterRoles(character);
+        return roles.length > 0 ? roles.join(" / ") : "-";
+      }
+
       // 役割カテゴリの候補を、配列データから重複なしで取り出して作ります。
-      const roles = [...new Set(charactersData.map((character) => character.role))];
+      const roles = [
+        ...new Set(
+          charactersData.flatMap((character) => getCharacterRoles(character))
+        )
+      ];
 
       // role-select にカテゴリ選択肢を追加します。
       roles.forEach((role) => {
@@ -279,7 +299,9 @@
         characterDetailPanelElement.classList.remove("is-empty");
         characterDetailNameElement.textContent = character.name;
         characterDetailFirstAppearanceElement.textContent = `初登場日: ${character.firstAppearance}`;
-        characterDetailRoleElement.textContent = `役割: ${character.role}`;
+        characterDetailRoleElement.textContent = `役割: ${formatCharacterRoles(
+          character
+        )}`;
         characterDetailSummaryElement.textContent = character.summary;
         characterDetailDescriptionElement.textContent = character.description || "";
         characterDetailDescriptionElement.hidden = !character.description;
@@ -334,7 +356,7 @@
 
           const roleElement = document.createElement("p");
           roleElement.className = "work-meta";
-          roleElement.textContent = `役割: ${character.role}`;
+          roleElement.textContent = `役割: ${formatCharacterRoles(character)}`;
 
           const summaryElement = document.createElement("p");
           summaryElement.className = "work-summary";
@@ -371,12 +393,19 @@
         // 3) 初登場日の古い順（年代順）にソート
         const filteredAndSortedCharacters = charactersData
           .filter((character) => {
+            const characterRoles = getCharacterRoles(character);
             const isRoleMatched =
-              selectedRole === "all" || character.role === selectedRole;
-            const isSearchMatched =
-              character.name.toLowerCase().includes(searchKeyword) ||
-              character.summary.toLowerCase().includes(searchKeyword) ||
-              (character.description || "").toLowerCase().includes(searchKeyword);
+              selectedRole === "all" || characterRoles.includes(selectedRole);
+            const searchableText = [
+              character.name,
+              character.firstAppearance,
+              characterRoles.join(" "),
+              character.summary,
+              character.description || ""
+            ]
+              .join(" ")
+              .toLowerCase();
+            const isSearchMatched = searchableText.includes(searchKeyword);
             return isRoleMatched && isSearchMatched;
           })
           .sort(
