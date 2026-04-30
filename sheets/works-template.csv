@@ -1,0 +1,4 @@
+id,title,releaseDate,category,summary,description,characterIds,published
+fate-stay-night,Fate/stay night,2004-01-30,ゲーム,聖杯戦争に巻き込まれた少年・衛宮士郎がサーヴァントとともに戦う物語。,3つのルートで物語が分岐し、それぞれ異なる視点で聖杯戦争の真実に迫っていく。,emiya-shirou;saber;tohsaka-rin,TRUE
+fate-zero,Fate/Zero,2011-10-02,アニメ,第四次聖杯戦争を舞台に複数の魔術師と英霊の戦いを描く前日譚。,"『Fate/stay night』へ続く物語として、各陣営の信念と葛藤を重厚な群像劇で描いている。",saber,TRUE
+sample-draft,入力中サンプル,YYYY-MM-DD,カテゴリ,一覧カードに表示する短い説明,詳細パネルに表示する説明,character-id-1;character-id-2,FALSE

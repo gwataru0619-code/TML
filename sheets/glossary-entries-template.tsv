@@ -1,0 +1,6 @@
+materialId	term	description	termCategories	published
+fsn-material	魔術	神秘を再現するための技法。現代に残るのは本来の奇跡を模倣した技術体系。	魔術理論;基礎概念	TRUE
+fsn-material	聖杯戦争	願望機・聖杯を巡り、7人のマスターと7騎のサーヴァントが争う儀式。	儀式;戦争システム	TRUE
+fsn-material	英霊	人類史に功績を残し、英霊の座に記録された存在。召喚時はサーヴァントとして現界する。	サーヴァント;霊基	TRUE
+fgo-material	特異点	人理の流れから逸脱した歴史上の異常点。修復しない限り未来が失われる。	世界観;人理修復	TRUE
+draft-material		入力途中の行は published を FALSE にします。		False
