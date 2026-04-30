@@ -37,7 +37,7 @@
               <input
                 id="search-input"
                 type="search"
-                placeholder="タイトル・あらすじで検索"
+                placeholder="タイトル・分類・あらすじで検索"
               />
             </label>
 
@@ -107,7 +107,7 @@
       // {
       //   title: "作品タイトル",
       //   releaseDate: "YYYY-MM-DD",
-      //   category: "ゲーム / アニメ / 小説 など",
+      //   categories: ["ゲーム", "アニメ", "小説 など"],
       //   summary: "一覧カードに表示する短い説明です。",
       //   description: "詳細パネルに表示する説明文です。（省略可）",
       //   characters: ["登場キャラクター名1", "登場キャラクター名2"]
@@ -116,7 +116,7 @@
         {
           title: "Fate/stay night",
           releaseDate: "2004-01-30",
-          category: "ゲーム",
+          categories: ["ゲーム", "ビジュアルノベル"],
           summary:
             "聖杯戦争に巻き込まれた少年・衛宮士郎が、サーヴァントとともに戦いへ身を投じる物語。",
           description:
@@ -126,7 +126,7 @@
         {
           title: "Fate/Zero",
           releaseDate: "2011-10-02",
-          category: "アニメ",
+          categories: ["アニメ", "小説"],
           summary:
             "第四次聖杯戦争を舞台に、複数の魔術師と英霊の戦いを描く前日譚。",
           description:
@@ -136,7 +136,7 @@
         {
           title: "月姫 -A piece of blue glass moon-",
           releaseDate: "2021-08-26",
-          category: "ゲーム",
+          categories: ["ゲーム", "ビジュアルノベル"],
           summary:
             "異能の眼を持つ遠野志貴が、吸血鬼事件の渦中で自身の過去と向き合っていく伝奇作品。",
           description:
@@ -146,7 +146,7 @@
         {
           title: "Fate/Grand Order",
           releaseDate: "2015-07-30",
-          category: "ゲーム",
+          categories: ["ゲーム", "モバイル"],
           summary:
             "人理焼却を阻止するため、時代を超えて英霊とともに特異点を巡る長編RPG。",
           description:
@@ -162,7 +162,7 @@
         {
           title: "空の境界",
           releaseDate: "2004-06-01",
-          category: "小説",
+          categories: ["小説", "劇場版"],
           summary:
             "両儀式を中心に、超常事件と人間の内面を描いた伝奇小説シリーズ。",
           description:
@@ -201,6 +201,23 @@
       let shouldScrollToSelectedWork = false;
       // URLの初期指定は1回だけ使いたいので、可変の変数に入れます。
       let pendingInitialWorkTitle = initialQueryWorkTitle;
+
+      // 作品の分類は複数入力できるため、常に配列として扱います。
+      function getWorkCategories(work) {
+        if (Array.isArray(work.categories)) {
+          return work.categories;
+        }
+        if (work.category) {
+          return [work.category];
+        }
+        return [];
+      }
+
+      function formatWorkCategories(work) {
+        const categories = getWorkCategories(work);
+        return categories.length > 0 ? categories.join(" / ") : "-";
+      }
+
       // URLパラメータの作品名を元に、検索条件を自動調整する関数です。
       function applyInitialWorkSelectionFromQuery() {
         if (!pendingInitialWorkTitle) {
@@ -215,12 +232,12 @@
         }
         // 該当作品が確実に表示されるように、検索欄とカテゴリをあわせて設定します。
         searchInputElement.value = targetWork.title;
-        categorySelectElement.value = targetWork.category;
+        categorySelectElement.value = getWorkCategories(targetWork)[0] || "all";
       }
 
 
       // カテゴリの候補を、配列データから重複なしで取り出して作ります。
-      const categories = [...new Set(worksData.map((work) => work.category))];
+      const categories = [...new Set(worksData.flatMap((work) => getWorkCategories(work)))];
 
       // category-select にカテゴリ選択肢を追加します。
       categories.forEach((category) => {
@@ -280,7 +297,7 @@
         detailPanelElement.classList.remove("is-empty");
         detailTitleElement.textContent = work.title;
         detailReleaseDateElement.textContent = `発売日: ${work.releaseDate}`;
-        detailCategoryElement.textContent = `分類: ${work.category}`;
+        detailCategoryElement.textContent = `分類: ${formatWorkCategories(work)}`;
         detailSummaryElement.textContent = work.summary;
         detailDescriptionElement.textContent = work.description || "";
         detailDescriptionElement.hidden = !work.description;
@@ -333,7 +350,7 @@
 
           const categoryElement = document.createElement("p");
           categoryElement.className = "work-meta";
-          categoryElement.textContent = `分類: ${work.category}`;
+          categoryElement.textContent = `分類: ${formatWorkCategories(work)}`;
 
           const summaryElement = document.createElement("p");
           summaryElement.className = "work-summary";
@@ -368,12 +385,19 @@
         // 3) 発売日の古い順（年代順）にソート
         const filteredAndSortedWorks = worksData
           .filter((work) => {
+            const workCategories = getWorkCategories(work);
             const isCategoryMatched =
-              selectedCategory === "all" || work.category === selectedCategory;
-            const isSearchMatched =
-              work.title.toLowerCase().includes(searchKeyword) ||
-              work.summary.toLowerCase().includes(searchKeyword) ||
-              (work.description || "").toLowerCase().includes(searchKeyword);
+              selectedCategory === "all" || workCategories.includes(selectedCategory);
+            const searchableText = [
+              work.title,
+              work.releaseDate,
+              workCategories.join(" "),
+              work.summary,
+              work.description || ""
+            ]
+              .join(" ")
+              .toLowerCase();
+            const isSearchMatched = searchableText.includes(searchKeyword);
             return isCategoryMatched && isSearchMatched;
           })
           .sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
