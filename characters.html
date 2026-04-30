@@ -30,7 +30,7 @@
     <main class="container">
       <section class="content-card">
         <!-- ここは検索と絞り込みの操作エリアです -->
-        <div class="works-controls" aria-label="キャラクターの検索と絞り込み">
+        <div class="works-controls" aria-label="キャラクターの検索・絞り込み・並び替え">
           <div class="works-controls-row">
             <label class="works-control-label" for="character-search-input">
               検索
@@ -45,6 +45,16 @@
               役割カテゴリ
               <select id="character-role-select">
                 <option value="all">すべて</option>
+              </select>
+            </label>
+
+            <label class="works-control-label" for="character-sort-select">
+              並び替え
+              <select id="character-sort-select">
+                <option value="first-appearance-asc">初登場日が古い順</option>
+                <option value="first-appearance-desc">初登場日が新しい順</option>
+                <option value="name-asc">名前のあいうえお順</option>
+                <option value="name-desc">名前の逆順</option>
               </select>
             </label>
           </div>
@@ -180,6 +190,10 @@
       const characterRoleSelectElement = document.getElementById(
         "character-role-select"
       );
+      // 並び替え選択欄の要素です。選ばれた値によって、一覧の順番を変えます。
+      const characterSortSelectElement = document.getElementById(
+        "character-sort-select"
+      );
       // 結果0件メッセージの要素を取得します。
       const charactersEmptyMessageElement = document.getElementById(
         "characters-empty-message"
@@ -234,6 +248,42 @@
       function formatCharacterRoles(character) {
         const roles = getCharacterRoles(character);
         return roles.length > 0 ? roles.join(" / ") : "-";
+      }
+
+      // 日付文字列を比較用の数値に変換します。日付として読めない場合は null にします。
+      function getCharacterDateTime(character) {
+        const dateTime = new Date(character.firstAppearance).getTime();
+        return Number.isNaN(dateTime) ? null : dateTime;
+      }
+
+      // 日付の古い順・新しい順を比べます。日付がないキャラはどちらの順でも最後にします。
+      function compareCharacterDates(a, b, isDescending) {
+        const dateA = getCharacterDateTime(a);
+        const dateB = getCharacterDateTime(b);
+        if (dateA === null && dateB === null) {
+          return 0;
+        }
+        if (dateA === null) {
+          return 1;
+        }
+        if (dateB === null) {
+          return -1;
+        }
+        return isDescending ? dateB - dateA : dateA - dateB;
+      }
+
+      // 並び替え選択欄の値に合わせて、キャラクター一覧の順番を決めます。
+      function compareCharactersBySortOption(a, b, sortOption) {
+        if (sortOption === "name-asc") {
+          return a.name.localeCompare(b.name, "ja");
+        }
+        if (sortOption === "name-desc") {
+          return b.name.localeCompare(a.name, "ja");
+        }
+        if (sortOption === "first-appearance-desc") {
+          return compareCharacterDates(a, b, true);
+        }
+        return compareCharacterDates(a, b, false);
       }
 
       // 役割カテゴリの候補を、配列データから重複なしで取り出して作ります。
@@ -387,10 +437,11 @@
           .trim()
           .toLowerCase();
         const selectedRole = characterRoleSelectElement.value;
+        const selectedSort = characterSortSelectElement.value;
 
         // 1) 役割カテゴリで絞り込み
         // 2) 名前と説明で検索
-        // 3) 初登場日の古い順（年代順）にソート
+        // 3) 選択された条件で並び替え
         const filteredAndSortedCharacters = charactersData
           .filter((character) => {
             const characterRoles = getCharacterRoles(character);
@@ -408,10 +459,7 @@
             const isSearchMatched = searchableText.includes(searchKeyword);
             return isRoleMatched && isSearchMatched;
           })
-          .sort(
-            (a, b) =>
-              new Date(a.firstAppearance) - new Date(b.firstAppearance)
-          );
+          .sort((a, b) => compareCharactersBySortOption(a, b, selectedSort));
 
         // URLに指定されたキャラ名がある場合は、初回だけそのキャラを選択します。
         if (pendingInitialCharacterName) {
@@ -446,6 +494,7 @@
       // 入力が変わるたびに再描画します。
       characterSearchInputElement.addEventListener("input", updateCharactersView);
       characterRoleSelectElement.addEventListener("change", updateCharactersView);
+      characterSortSelectElement.addEventListener("change", updateCharactersView);
       characterClosePanelButtonElement.addEventListener("click", () => {
         selectedCharacterName = null;
         resetCharacterDetailPanel();

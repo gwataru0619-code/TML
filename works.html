@@ -30,7 +30,7 @@
     <main class="container">
       <section class="content-card">
         <!-- ここは検索と絞り込みの操作エリアです -->
-        <div class="works-controls" aria-label="作品の検索と絞り込み">
+        <div class="works-controls" aria-label="作品の検索・絞り込み・並び替え">
           <div class="works-controls-row">
             <label class="works-control-label" for="search-input">
               検索
@@ -45,6 +45,16 @@
               カテゴリ
               <select id="category-select">
                 <option value="all">すべて</option>
+              </select>
+            </label>
+
+            <label class="works-control-label" for="sort-select">
+              並び替え
+              <select id="sort-select">
+                <option value="releaseDateAsc">発売日が古い順</option>
+                <option value="releaseDateDesc">発売日が新しい順</option>
+                <option value="titleAsc">作品名 あいうえお順</option>
+                <option value="titleDesc">作品名 あいうえお逆順</option>
               </select>
             </label>
           </div>
@@ -181,6 +191,8 @@
       const searchInputElement = document.getElementById("search-input");
       // カテゴリ選択の要素を取得します。
       const categorySelectElement = document.getElementById("category-select");
+      // 並び替え選択の要素を取得します。
+      const sortSelectElement = document.getElementById("sort-select");
       // 結果0件メッセージの要素を取得します。
       const emptyMessageElement = document.getElementById("empty-message");
       // 詳細サイドパネル関連の要素を取得します。
@@ -216,6 +228,55 @@
       function formatWorkCategories(work) {
         const categories = getWorkCategories(work);
         return categories.length > 0 ? categories.join(" / ") : "-";
+      }
+
+      // 日付文字列を比較用の数値に変換します。
+      // 日付が空欄や不正な文字列の場合は、あとで最後に並べられるよう Infinity にします。
+      function getWorkDateTime(work) {
+        const dateTime = new Date(work.releaseDate).getTime();
+        return Number.isNaN(dateTime) ? Number.POSITIVE_INFINITY : dateTime;
+      }
+
+      // 発売日で並び替えるための比較処理です。
+      // 日付が空の作品は、古い順・新しい順のどちらでも最後に置きます。
+      function compareWorkReleaseDates(a, b, direction) {
+        const aDateTime = getWorkDateTime(a);
+        const bDateTime = getWorkDateTime(b);
+        if (
+          aDateTime === Number.POSITIVE_INFINITY &&
+          bDateTime === Number.POSITIVE_INFINITY
+        ) {
+          return 0;
+        }
+        if (aDateTime === Number.POSITIVE_INFINITY) {
+          return 1;
+        }
+        if (bDateTime === Number.POSITIVE_INFINITY) {
+          return -1;
+        }
+        if (direction === "desc") {
+          return bDateTime - aDateTime;
+        }
+        return aDateTime - bDateTime;
+      }
+
+      // 選択された並び替え条件に合わせて、作品配列を並べ替えます。
+      function sortWorks(works, sortMode) {
+        const sortedWorks = [...works];
+        sortedWorks.sort((a, b) => {
+          if (sortMode === "releaseDateDesc") {
+            return compareWorkReleaseDates(a, b, "desc");
+          }
+          if (sortMode === "titleAsc") {
+            return a.title.localeCompare(b.title, "ja");
+          }
+          if (sortMode === "titleDesc") {
+            return b.title.localeCompare(a.title, "ja");
+          }
+          // 初期状態は、今までと同じ「発売日が古い順」です。
+          return compareWorkReleaseDates(a, b, "asc");
+        });
+        return sortedWorks;
       }
 
       // URLパラメータの作品名を元に、検索条件を自動調整する関数です。
@@ -381,29 +442,29 @@
       function updateWorksView() {
         const searchKeyword = searchInputElement.value.trim().toLowerCase();
         const selectedCategory = categorySelectElement.value;
+        const selectedSort = sortSelectElement.value;
 
         // 1) カテゴリで絞り込み
         // 2) タイトルとあらすじで検索
-        // 3) 発売日の古い順（年代順）にソート
-        const filteredAndSortedWorks = worksData
-          .filter((work) => {
-            const workCategories = getWorkCategories(work);
-            const isCategoryMatched =
-              selectedCategory === "all" ||
-              workCategories.includes(selectedCategory);
-            const searchableText = [
-              work.title,
-              work.releaseDate,
-              workCategories.join(" "),
-              work.summary,
-              work.description || ""
-            ]
-              .join(" ")
-              .toLowerCase();
-            const isSearchMatched = searchableText.includes(searchKeyword);
-            return isCategoryMatched && isSearchMatched;
-          })
-          .sort((a, b) => new Date(a.releaseDate) - new Date(b.releaseDate));
+        // 3) 選択された条件で並び替え
+        const filteredWorks = worksData.filter((work) => {
+          const workCategories = getWorkCategories(work);
+          const isCategoryMatched =
+            selectedCategory === "all" ||
+            workCategories.includes(selectedCategory);
+          const searchableText = [
+            work.title,
+            work.releaseDate,
+            workCategories.join(" "),
+            work.summary,
+            work.description || ""
+          ]
+            .join(" ")
+            .toLowerCase();
+          const isSearchMatched = searchableText.includes(searchKeyword);
+          return isCategoryMatched && isSearchMatched;
+        });
+        const filteredAndSortedWorks = sortWorks(filteredWorks, selectedSort);
 
         // URLに指定された作品名がある場合は、初回だけその作品を選択します。
         if (pendingInitialWorkTitle) {
@@ -438,6 +499,7 @@
       // 入力が変わるたびに再描画します。
       searchInputElement.addEventListener("input", updateWorksView);
       categorySelectElement.addEventListener("change", updateWorksView);
+      sortSelectElement.addEventListener("change", updateWorksView);
       closePanelButtonElement.addEventListener("click", () => {
         selectedWorkTitle = null;
         resetDetailPanel();
