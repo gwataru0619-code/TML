@@ -264,6 +264,8 @@ a {
   margin-top: 12px;
   line-height: 1.8;
   color: #cbd5e1;
+  /* history配列を "\n" でつないだ改行を、画面上でも改行として表示します */
+  white-space: pre-line;
 }
 
 .relation-label {
@@ -340,9 +342,14 @@ a {
 }
 
 @media (min-width: 1200px) {
+  .works-page-container {
+    /* 一般的なノートPCより広い画面では、作品ページ全体の枠も広げます */
+    width: min(1600px, 96%);
+  }
+
   .works-page-container .works-layout {
     /* 作品ページでは右側の詳細欄を少し広めにして、長文を読みやすくします */
-    grid-template-columns: minmax(0, 1.6fr) minmax(420px, 0.9fr);
+    grid-template-columns: minmax(0, 1.4fr) minmax(520px, 1fr);
   }
 }
 
@@ -353,7 +360,7 @@ a {
   }
 
   .works-page-container .works-layout {
-    grid-template-columns: minmax(0, 1.5fr) minmax(520px, 0.9fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(640px, 1fr);
   }
 }
 
