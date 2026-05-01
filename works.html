@@ -125,6 +125,10 @@
       //     { label: "シナリオ", names: ["担当者名"] },
       //     { label: "作画", names: ["担当者名1", "担当者名2"] }
       //   ],
+      //   media: [
+      //     { type: "ゲーム", title: "作品タイトル", detail: "対応機種など" },
+      //     { type: "漫画", title: "作品タイトル", detail: "作者 / 掲載誌 / 巻数" }
+      //   ],
       //   history: [
       //     "発表・発売・連載・放送などの履歴を1行ずつ書きます。",
       //     "行を増やしたいときは、この配列に文字列を追加してください。"
@@ -142,6 +146,60 @@
           credits: [
              { label: "シナリオ", names: ["奈須きのこ"] },
              { label: "キャラクターデザイン", names: ["武内崇"] }
+          ],
+          // media は、日付ではなく「どの媒体で何が出ているか」を整理するための配列です。
+          // type が見出し、title が作品名、detail がカッコ内の補足として表示されます。
+          media: [
+            {
+              type: "ゲーム",
+              title: "Fate/stay night",
+              detail: "Windows 98/ME/2000/XP"
+            },
+            {
+              type: "ゲーム",
+              title: "Fate/stay night [Réalta Nua]",
+              detail: "PlayStation 2"
+            },
+            {
+              type: "ゲーム",
+              title: "Fate/stay night REMASTERED",
+              detail: "Nintendo Switch / Steam"
+            },
+            {
+              type: "漫画",
+              title: "Fate/stay night",
+              detail: "西脇だっと / 月刊少年エース / 全20巻"
+            },
+            {
+              type: "漫画",
+              title: "Fate/stay night [Heaven's Feel]",
+              detail: "タスクオーナ / ヤングエース"
+            },
+            {
+              type: "漫画",
+              title: "Fate/stay night [Unlimited Blade Works]",
+              detail: "森山大輔 / 月刊コミック電撃大王"
+            },
+            {
+              type: "テレビアニメ",
+              title: "Fate/stay night",
+              detail: "スタジオディーン"
+            },
+            {
+              type: "テレビアニメ",
+              title: "Fate/stay night [Unlimited Blade Works]",
+              detail: "ufotable"
+            },
+            {
+              type: "劇場版アニメ",
+              title: "Fate/stay night UNLIMITED BLADE WORKS",
+              detail: "スタジオディーン"
+            },
+            {
+              type: "劇場版アニメ",
+              title: "Fate/stay night [Heaven's Feel] I.presage flower",
+              detail: "ufotable"
+            }
           ],
           // history は、年表のような情報を1項目ずつ管理するための配列です。
           // 画面では自動的に改行して表示します。
@@ -171,6 +229,7 @@
              { label: "シナリオ", names: ["奈須きのこ"] },
              { label: "キャラクターデザイン", names: ["武内崇"] }
           ],
+          media: [],
           history: [
             "2005年10月28日 Windows 98/ME/2000/XP用ゲーム「Fate/hollow ataraxia」発売",
             "月刊少年エース2013年7月号 漫画「Fate/hollow ataraxia」（雌鳥）が連載開始 全2巻",
@@ -191,6 +250,7 @@
              { label: "著者", names: ["虚淵玄"] },
              { label: "イラスト", names: ["武内崇"] }
           ],
+          media: [],
           history: [
             "2006年12月29日から2007年12月29日 小説「Fate/Zero」（虚淵玄）TYPE-MOON BOOKSより刊行 全4巻",
             "2008年8月22日から2010年1月22日 ドラマCD 「Sound Drama Fate/Zero」発売 全4巻",
@@ -209,6 +269,7 @@
             { label: "シナリオ", names: ["奈須きのこ"] },
             { label: "キャラクターデザイン", names: ["ワダアルコ"] }
           ],
+          media: [],
           history: [
             "2010年7月22日 PlayStation Portable用ゲーム「Fate/EXTRA」発売",
             "コンプティーク2011年5月号から2014年12月号 漫画「Fate/EXTRA」（ろび〜な）連載 全6巻",
@@ -228,6 +289,7 @@
             { label: "シナリオ", names: ["奈須きのこ"] },
             { label: "キャラクターデザイン", names: ["ワダアルコ"] }
           ],
+          media: [],
           history: [
             "2013年3月28日 PlayStation Portable用ゲーム「Fate/EXTRA CCC」発売",
             "月刊コンプエース2013年12月号から漫画「Fate/EXTRA CCC FoxTail」（たけのこ星人）連載開始",
@@ -245,6 +307,7 @@
             { label: "シナリオ", names: ["奈須きのこ", "桜井光", "東出祐一郎", "小太刀右京"] },
             { label: "キャラクターデザイン", names: ["ワダアルコ"] }
           ],
+          media: [],
           history: [
             "2016年11月10日 PlayStation 4/PlayStation Vita用ゲーム「Fate/EXTELLA」発売。",
             "2018年6月7日 PlayStation 4/PlayStation Vita用ゲーム「Fate/EXTELLA LINK」発売"
@@ -261,6 +324,7 @@
             { label: "著者", names: ["東出祐一郎"] },
             { label: "イラスト", names: ["近衛乙嗣"] }
           ],
+          media: [],
           history: [
             "2012年12月31日から2014年12月30日 小説「Fate/Apocrypha」（東出祐一郎）TYPE-MOON BOOKSより刊行 全5巻",
             "月刊コンプエース2016年8月号から2024年6月号 漫画「Fate/Apocrypha」（石田あきら）連載 全16巻",
@@ -278,6 +342,7 @@
             { label: "著者", names: ["成田良悟"] },
           　{ label: "イラスト", names: ["森井しづき"] }
           ],
+          media: [],
           history: [
             "2008年4月1日 成田良悟の個人ホームページでプロト版「Fake/states night」限定掲載",
             "2009年1月21日 「TYPE-MOONエース」Vol.2に「Fate/strange fake」収録",
@@ -298,6 +363,7 @@
           credits: [
             { label: "著者", names: ["奈須きのこ"] }
           ],
+          media: [],
           history: [
             "奈須きのこ学生時代に執筆 未発表",
             "2011年12月31日 「カーニバル・ファンタズム 3rd Season」の映像特典としてOVA「Fate/Prototype」発表",
@@ -316,6 +382,7 @@
              { label: "著者", names: ["桜井光"] },
           　 { label: "イラスト", names: ["中原"] }
           ],
+          media: [],
           history: [
             "コンプティーク2013年8月号から2016年10月号 小説「Fate/Prototype 蒼銀のフラグメンツ」連載 全5巻 ",
             "コンプティーク2015年5月号から2015年7月号 小説「Fate/Labyrinth」連載 全1巻",
@@ -333,6 +400,7 @@
           credits: [
             { label: "作画", names: ["ひろやまひろし"] }
           ],
+          media: [],
           history: [
             "月刊コンプエース2007年11月号から2009年1月号 漫画「Fate/kaleid liner プリズマ☆イリヤ」（ひろやまひろし）連載 全2巻",
             "月刊コンプエース2009年6月号から2012年5月号 漫画「Fate/kaleid liner プリズマ☆イリヤ ツヴァイ！」（ひろやまひろし）連載 全5巻",
@@ -357,6 +425,7 @@
           description:
             "ビジュアル・演出を刷新したリメイク版。伝奇ホラーと青春劇の要素が融合した独特の世界観が特徴。",
           credits: [],
+          media: [],
           history: [],
           characters: ["アルクェイド・ブリュンスタッド"]
         },
@@ -369,6 +438,7 @@
           description:
             "多数のシナリオライターによる章構成で、歴史・神話の英霊たちと協力しながら世界の危機に挑む。",
           credits: [],
+          media: [],
           history: [],
           characters: [
             "衛宮士郎",
@@ -385,6 +455,7 @@
           summary: "",
           description: "",
           credits: [],
+          media: [],
           history: [],
           characters: []
         },
@@ -395,6 +466,7 @@
           summary: "",
           description: "",
           credits: [],
+          media: [],
           history: [],
           characters: []
         },
@@ -405,6 +477,7 @@
           summary: "",
           description: "",
           credits: [],
+          media: [],
           history: [],
           characters: []
         },
@@ -415,6 +488,7 @@
           summary: "",
           description: "",
           credits: [],
+          media: [],
           history: [],
           characters: []
         },
@@ -425,6 +499,7 @@
           summary: "",
           description: "",
           credits: [],
+          media: [],
           history: [],
           characters: []
         },
@@ -437,6 +512,7 @@
           description:
             "時系列が複雑に組まれた構成と、静かで鋭い文体が魅力。TYPE-MOON作品群の原点のひとつ。",
           credits: [],
+          media: [],
           history: [
             "2001年12月30日 同人誌として発売。",
             "2004年6月8日 講談社ノベルス版が発売。",
@@ -523,6 +599,40 @@
           .join("\n");
       }
 
+      // media は日付ではなく、媒体ごとの展開をまとめるための配列です。
+      function getWorkMediaItems(work) {
+        if (!Array.isArray(work.media)) {
+          return [];
+        }
+        return work.media;
+      }
+
+      // メディア展開を「媒体見出し + 箇条書き」の文章に変換します。
+      function formatWorkMedia(work) {
+        const groupedMedia = new Map();
+        getWorkMediaItems(work).forEach((item) => {
+          if (!item.type || !item.title) {
+            return;
+          }
+          if (!groupedMedia.has(item.type)) {
+            groupedMedia.set(item.type, []);
+          }
+          const detailText = item.detail ? `（${item.detail}）` : "";
+          groupedMedia.get(item.type).push(`- ${item.title}${detailText}`);
+        });
+
+        if (groupedMedia.size === 0) {
+          return "";
+        }
+
+        const lines = ["メディア展開"];
+        groupedMedia.forEach((items, type) => {
+          lines.push(type);
+          lines.push(...items);
+        });
+        return lines.join("\n");
+      }
+
       // history は配列で入力します。画面表示や検索では、1つの文章として扱えるように結合します。
       function formatWorkHistory(work) {
         if (!Array.isArray(work.history) || work.history.length === 0) {
@@ -536,6 +646,7 @@
         const detailParts = [
           work.description || "",
           formatWorkCredits(work),
+          formatWorkMedia(work),
           formatWorkHistory(work)
         ].filter((text) => text);
         return detailParts.join("\n\n");
@@ -783,6 +894,7 @@
             work.summary,
             work.description || "",
             formatWorkCredits(work),
+            formatWorkMedia(work),
             formatWorkHistory(work)
           ]
             .join(" ")
